@@ -24,7 +24,7 @@ def upgrade():
                     sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
                     sa.Column("first_name", sa.String(length=35), nullable=False),
                     sa.Column("last_name", sa.String(length=35), nullable=False),
-                    sa.Column("gender", sa.String(length=1), nullable=False),
+                    sa.Column("gender", sa.Text(length=1), nullable=False),
                     sa.Column("country", sa.Text(length=56), nullable=False),
                     sa.Column("native_lang", sa.Text(length=20), nullable=False),
                     sa.Column("lang_focus", sa.Text(length=3), nullable=False),
