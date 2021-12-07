@@ -30,6 +30,8 @@ def upgrade():
                     sa.Column("lang_focus", sa.Text(length=3), nullable=False),
                     sa.Column("line_id", sa.Text(length=15), nullable=True, unique=True),
                     sa.Column("line_api_id", sa.String(length=40), nullable=True, unique=True),
+                    sa.Column("meetup_id", sa.Text(length=10), nullable=True, unique=True),
+                    sa.Column("meetup_name", sa.Text(length=25), nullable=True),
                     sa.Column("created_at", sa.DateTime(), nullable=False),
                     sa.Column("last_modified", sa.DateTime(), nullable=True),
                     sa.PrimaryKeyConstraint("id")

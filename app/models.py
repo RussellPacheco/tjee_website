@@ -14,11 +14,13 @@ class Member(db.Model):
     lang_focus = db.Column(db.Text(3), nullable=False)
     line_id = db.Column(db.Text(15), nullable=True)
     line_api_id = db.Column(db.String(40), nullable=True)
+    meetup_id = db.Column(db.Text(10), nullable=True)
+    meetup_name = db.Column(db.Text(25), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
     last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
 
     admin = db.relationship("Admin", back_populates="member", lazy=True, cascade="all, delete")
-    messages = db.relationship("Line_Message", back_populates="member", lazy=True)
+    messages = db.relationship("LineMessage", back_populates="member", lazy=True)
 
     def __repr__(self):
         return '<Member %r>' % self.first_name
@@ -39,7 +41,7 @@ class Admin(db.Model):
         return '<Admin %r>' % self.username
 
 
-class Line_Message(db.Model):
+class LineMessage(db.Model):
     __tablename__ = "line_messages"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     created_by = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
@@ -51,4 +53,4 @@ class Line_Message(db.Model):
     member = db.relationship("Member", back_populates="messages", lazy=True)
 
     def __repr__(self):
-        return '<Line_Message %r>' % self.message
+        return '<LineMessage %r>' % self.message
