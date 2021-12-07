@@ -57,6 +57,14 @@ def upgrade():
                     sa.ForeignKeyConstraint(['created_by'], ['members.id'], ondelete="SET NULL"),
                     sa.PrimaryKeyConstraint('id')
                     )
+
+    op.create_table("new_members",
+                    sa.Column("id", sa.Integer(), nullable=False),
+                    sa.Column("meetup_id", sa.Text(length=10), nullable=True, unique=True),
+                    sa.Column("meetup_name", sa.Text(length=25), nullable=True),
+                    sa.Column("created_at", sa.DateTime(), nullable=False),
+                    sa.PrimaryKeyConstraint('id')
+                    )
     pass
 
 

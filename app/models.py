@@ -54,3 +54,14 @@ class LineMessage(db.Model):
 
     def __repr__(self):
         return '<LineMessage %r>' % self.message
+
+
+class NewMembers(db.Model):
+    __tablename__= "new_members"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    meetup_id = db.Column(db.Text(10), nullable=True)
+    meetup_name = db.Column(db.Text(25), nullable=True)
+    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+
+    def __repr__(self):
+        return '<NewMember %r>' % self.meetup_name

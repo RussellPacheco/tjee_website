@@ -101,7 +101,7 @@ def delete_message(message_id):
 
 @app.route("/api/meetup/new-members", methods=["GET"])
 def get_new_member_applications():
-    data = controller_get_new_member_application():
+    data = controller_get_new_member_application()
     return data
 
 
