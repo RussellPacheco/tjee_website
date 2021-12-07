@@ -71,4 +71,6 @@ def upgrade():
 def downgrade():
     op.drop_table("members")
     op.drop_table("admins")
+    op.drop_table("line_messages")
+    op.drop_table("new_members")
     pass
