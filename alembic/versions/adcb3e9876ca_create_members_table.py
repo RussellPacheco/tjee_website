@@ -30,17 +30,29 @@ def upgrade():
                     sa.Column("lang_focus", sa.Text(length=3), nullable=False),
                     sa.Column("line_id", sa.Text(length=15), nullable=True, unique=True),
                     sa.Column("line_api_id", sa.String(length=40), nullable=True, unique=True),
-                    sa.Column('created_at', sa.DateTime(), nullable=True),
-                    sa.Column('last_modified', sa.DateTime(), nullable=True),
+                    sa.Column("created_at", sa.DateTime(), nullable=False),
+                    sa.Column("last_modified", sa.DateTime(), nullable=True),
                     sa.PrimaryKeyConstraint("id")
                     )
     op.create_table("admins",
                     sa.Column("id", sa.Integer(), nullable=False),
-                    sa.Column("member_id", postgresql.UUID(as_uuid=True), nullable=False),
-                    sa.Column('username', sa.String(length=65), nullable=False),
-                    sa.Column('password', sa.String(length=200), nullable=False),
-                    sa.Column('created_at', sa.DateTime(), nullable=True),
-                    sa.ForeignKeyConstraint(['member_id'], ['members.id'], ),
+                    sa.Column("member_id", postgresql.UUID(as_uuid=True), nullable=False, unique=True),
+                    sa.Column("username", sa.String(length=65), nullable=False),
+                    sa.Column("password", sa.String(length=200), nullable=False),
+                    sa.Column("created_at", sa.DateTime(), nullable=False),
+                    sa.Column("last_modified", sa.DateTime(), nullable=True),
+                    sa.ForeignKeyConstraint(['member_id'], ['members.id'], ondelete="CASCADE"),
+                    sa.PrimaryKeyConstraint('id')
+                    )
+
+    op.create_table("line_messages",
+                    sa.Column("id", sa.Integer(), nullable=False),
+                    sa.Column("created_by", postgresql.UUID(as_uuid=True), nullable=False),
+                    sa.Column("message", sa.Text(length=700), nullable=False),
+                    sa.Column("created_at", sa.DateTime(), nullable=False),
+                    sa.Column("last_sent", sa.DateTime(), nullable=True),
+                    sa.Column("last_modified", sa.DateTime(), nullable=True),
+                    sa.ForeignKeyConstraint(['created_by'], ['members.id'], ondelete="SET NULL"),
                     sa.PrimaryKeyConstraint('id')
                     )
     pass

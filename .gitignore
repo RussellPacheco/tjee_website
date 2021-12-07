@@ -2,3 +2,5 @@
 /.env
 /.idea/
 /.flaskenv
+/backend_requirements.txt
+/.backend_requirements.txt.swp
