@@ -52,7 +52,7 @@ def controller_admin_login(db, admin_obj, json_data):
         return str(e)
 
 
-def controller_admin_create(db, admin_obj, json_data):
+def controller_admin_create(db, member_obj, admin_obj, json_data):
     try:
         data = service_admin_create(db, admin_obj, json_data)
         return data

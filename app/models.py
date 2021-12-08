@@ -6,8 +6,8 @@ import uuid
 class Member(db.Model):
     __tablename__ = "members"
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    first_name = db.Column(db.String(35), nullable=False)
-    last_name = db.Column(db.String(35), nullable=False)
+    firstname = db.Column(db.String(35), nullable=False)
+    lastname = db.Column(db.String(35), nullable=False)
     gender = db.Column(db.Text(1), nullable=False)
     country = db.Column(db.Text(54), nullable=False)
     native_lang = db.Column(db.Text(20), nullable=False)

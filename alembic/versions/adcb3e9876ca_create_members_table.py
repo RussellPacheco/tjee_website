@@ -22,8 +22,8 @@ depends_on = None
 def upgrade():
     op.create_table("members",
                     sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
-                    sa.Column("first_name", sa.String(length=35), nullable=False),
-                    sa.Column("last_name", sa.String(length=35), nullable=False),
+                    sa.Column("firstname", sa.String(length=35), nullable=False),
+                    sa.Column("lastname", sa.String(length=35), nullable=False),
                     sa.Column("gender", sa.Text(length=1), nullable=False),
                     sa.Column("country", sa.Text(length=56), nullable=False),
                     sa.Column("native_lang", sa.Text(length=20), nullable=False),
