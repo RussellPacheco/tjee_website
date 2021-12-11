@@ -24,7 +24,6 @@ db = SQLAlchemy(app)
 #
 ###
 
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@localhost:5432/greenhouse")
 engine = create_engine(f"postgresql://{DB_CONNECTION}")
 if not database_exists(engine.url):
     create_database(engine.url)

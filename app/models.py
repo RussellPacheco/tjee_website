@@ -57,7 +57,7 @@ class LineMessage(db.Model):
 
 
 class NewMembers(db.Model):
-    __tablename__= "new_members"
+    __tablename__ = "new_members"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     meetup_id = db.Column(db.Text(10), nullable=True)
     meetup_name = db.Column(db.Text(25), nullable=True)
