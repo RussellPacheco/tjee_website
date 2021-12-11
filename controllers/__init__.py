@@ -1,4 +1,3 @@
-from flask import json
 from services import *
 
 
@@ -9,9 +8,9 @@ from services import *
 #########
 
 
-def controller_create_member(db, member_obj, admin_obj, json_data):
+def controller_create_member(db, member_obj, json_data):
     try:
-        data = service_create_member(db, member_obj, admin_obj, json_data)
+        data = service_create_member(db, member_obj, json_data)
         return data
 
     except Exception as e:
@@ -43,16 +42,16 @@ def controller_get_all_members(member_obj):
 #########
 
 
-def controller_admin_login(db, admin_obj, json_data):
+def controller_admin_login(admin_obj, json_data):
     try:
-        data = service_admin_login(db, admin_obj, json_data)
+        data = service_admin_login(admin_obj, json_data)
         return data
 
     except Exception as e:
         return str(e)
 
 
-def controller_admin_create(db, member_obj, admin_obj, json_data):
+def controller_admin_create(db, admin_obj, json_data):
     try:
         data = service_admin_create(db, admin_obj, json_data)
         return data

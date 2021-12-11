@@ -1,6 +1,3 @@
-from sqlalchemy.sql import extract
-
-
 #########
 #
 # Members
@@ -10,8 +7,8 @@ from sqlalchemy.sql import extract
 def dao_create_member(db, member_obj, firstname, lastname, gender, country, native_lang, lang_focus, line_id,
                       line_api_id, meetup_id, meetup_name):
     new_member = member_obj(firstname=firstname, lastname=lastname, gender=gender, country=country,
-                          native_lang=native_lang, lang_focus=lang_focus, line_id=line_id,
-                          line_api_id=line_api_id, meetup_id=meetup_id, meetup_name=meetup_name)
+                            native_lang=native_lang, lang_focus=lang_focus, line_id=line_id,
+                            line_api_id=line_api_id, meetup_id=meetup_id, meetup_name=meetup_name)
     db.session.add(new_member)
     db.session.commit()
 

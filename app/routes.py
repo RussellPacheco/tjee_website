@@ -2,7 +2,7 @@ from app import app
 from controllers import *
 from app import db
 from app.models import Member, Admin, LineMessage, NewMembers
-from flask import request, send_from_directory
+from flask import request
 
 
 @app.route("/")
@@ -18,7 +18,7 @@ def index():
 
 @app.route("/api/members/create", methods=["POST"])
 def member_create():
-    data = controller_create_member(db, Member, Admin, request.json)
+    data = controller_create_member(db, Member, request.json)
     return data
 
 
@@ -42,7 +42,7 @@ def member_get_all():
 
 @app.route("/api/admins/login", methods=["POST"])
 def admin_login():
-    data = controller_admin_login(db, Admin, request.json)
+    data = controller_admin_login(Admin, request.json)
     return data
 
 
@@ -116,5 +116,3 @@ def message_delete(message_id):
 def get_new_member_applications():
     data = controller_get_new_member_application(db, NewMembers)
     return data
-
-

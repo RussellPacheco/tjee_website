@@ -1,6 +1,8 @@
+import binascii
+import hashlib
+import os
+
 from dao import *
-import hashlib, os, binascii
-from datetime import date
 
 
 #########
@@ -104,7 +106,7 @@ def service_get_all_members(member_obj):
 #
 #########
 
-def service_admin_login(db, admin_obj, json_data):
+def service_admin_login(admin_obj, json_data):
     admin_exists = dao_get_admin_by_username(admin_obj, json_data["username"])
 
     status = {"status": 1}
