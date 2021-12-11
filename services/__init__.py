@@ -9,8 +9,8 @@ from datetime import date
 #
 #########
 
-def service_create_member(db, member_obj, admin_obj, json_data):
-    member_exist = dao_get_member(member_obj, json_data["firstname"], json_data["lastname"])
+def service_create_member(db, member_obj, json_data):
+    member_exist = dao_get_member_by_fullname(member_obj, json_data["firstname"], json_data["lastname"])
 
     status = {"status": 1}
 
@@ -40,7 +40,7 @@ def service_create_member(db, member_obj, admin_obj, json_data):
 
 
 def service_get_member(member_obj, member_id):
-    data = dao_get_member(member_obj, member_id)
+    data = dao_get_member_by_id(member_obj, member_id)
 
     status = {"status": 1}
 
@@ -105,7 +105,7 @@ def service_get_all_members(member_obj):
 #########
 
 def service_admin_login(db, admin_obj, json_data):
-    admin_exists = dao_get_admin(admin_obj, json_data["username"])
+    admin_exists = dao_get_admin_by_username(admin_obj, json_data["username"])
 
     status = {"status": 1}
 
@@ -130,7 +130,7 @@ def service_admin_login(db, admin_obj, json_data):
 
 
 def service_admin_create(db, admin_obj, json_data):
-    admin_exist = dao_get_admin(admin_obj, json_data["username"])
+    admin_exist = dao_get_admin_by_username(admin_obj, json_data["username"])
 
     status = {"status": 1}
 
@@ -159,7 +159,7 @@ def service_admin_create(db, admin_obj, json_data):
 
 
 def service_admin_delete(db, admin_obj, json_data):
-    admin_exist = dao_get_admin(admin_obj, json_data["username"])
+    admin_exist = dao_get_admin_by_username(admin_obj, json_data["username"])
 
     status = {"status": 1}
 
@@ -172,7 +172,7 @@ def service_admin_delete(db, admin_obj, json_data):
 
 
 def service_admin_change_password(db, admin_obj, json_data):
-    admin_exist = dao_get_admin(admin_obj, json_data["username"])
+    admin_exist = dao_get_admin_by_username(admin_obj, json_data["username"])
 
     status = {"status": 1}
 
@@ -185,8 +185,15 @@ def service_admin_change_password(db, admin_obj, json_data):
     pwdhash = binascii.hexlify(pwdhash).decode("ascii")
 
     if pwdhash == stored_password:
-        dao_admin_change_password(db, admin_obj, json_data["username"])
+        salt = hashlib.sha256(os.urandom(60)).hexdigest().encode("ascii")
+        hashed_pwd = hashlib.pbkdf2_hmac("sha512", json_data["new_password"].encode("utf-8"), salt, 100000)
+        hashed_pwd = binascii.hexlify(hashed_pwd)
+
+        salt_hashedpwd = (salt + hashed_pwd).decode("ascii")
+
+        dao_admin_change_password(db, admin_obj, json_data["username"], salt_hashedpwd)
         status["status"] = 0
+
         return status
     else:
         status["status"] = -1
@@ -236,7 +243,6 @@ def service_line_get_message(line_obj, message_id):
 
     status = {"status": 1}
 
-
     if message is None:
         return status
 
@@ -259,7 +265,7 @@ def service_line_update_message(db, line_obj, message_id, json_data):
 
 
 def service_line_delete_message(db, line_obj, message_id):
-    message_exist = dao_get_message(line_obj, message_id)
+    message_exist = dao_line_get_message(line_obj, message_id)
 
     status = {"status": 1}
 
