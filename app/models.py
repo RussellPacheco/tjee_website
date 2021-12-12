@@ -43,7 +43,7 @@ class Admin(db.Model):
 
 class LineMessage(db.Model):
     __tablename__ = "line_messages"
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     created_by = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
     message = db.Column(db.String(700), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)

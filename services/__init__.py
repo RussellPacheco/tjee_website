@@ -1,7 +1,7 @@
 import binascii
 import hashlib
 import os
-
+from datetime import datetime
 from dao import *
 
 
@@ -227,7 +227,7 @@ def service_line_create_message(db, line_obj, json_data):
 
     messages = service_line_get_all_messages(line_obj)
 
-    return {"status": 0, "messages": messages}
+    return messages
 
 
 def service_line_send_message(db, line_obj, json_data):
@@ -288,7 +288,7 @@ def service_line_update_message(db, line_obj, message_id, json_data):
     if message is None:
         return status
 
-    dao_line_update_message(db, line_obj, message_id, json_data["message"])
+    dao_line_update_message(db, line_obj, message_id, json_data["message"], datetime.now())
 
     return service_line_get_message(line_obj, message_id)
 
@@ -302,8 +302,7 @@ def service_line_delete_message(db, line_obj, message_id):
         return status
 
     dao_line_delete_message(db, line_obj, message_id)
-    status["status"] = 0
-    return status
+    return service_line_get_all_messages(line_obj)
 
 
 #########

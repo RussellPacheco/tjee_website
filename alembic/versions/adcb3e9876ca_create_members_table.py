@@ -48,7 +48,7 @@ def upgrade():
                     )
 
     op.create_table("line_messages",
-                    sa.Column("id", sa.Integer(), nullable=False),
+                    sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False, unique=True),
                     sa.Column("created_by", postgresql.UUID(as_uuid=True), nullable=False),
                     sa.Column("message", sa.String(length=700), nullable=False),
                     sa.Column("created_at", sa.DateTime(), nullable=False),

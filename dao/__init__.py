@@ -76,18 +76,17 @@ def dao_line_get_all_messages(line_obj):
 
 
 def dao_line_get_message(line_obj, message_id):
-    result = line_obj.query.filter_by(message_id=message_id).first()
+    result = line_obj.query.filter_by(id=message_id).first()
     return result
 
 
-def dao_line_update_message(db, line_obj, message_id, new_message):
-    message = line_obj.query.filter_by(message_id=message_id)
-    message.message = new_message
+def dao_line_update_message(db, line_obj, message_id, new_message, last_modified):
+    line_obj.query.filter_by(id=message_id).update(dict(message=new_message, last_modified=last_modified))
     db.session.commit()
 
 
 def dao_line_delete_message(db, line_obj, message_id):
-    message = line_obj.query.filter_by(message_id=message_id).first()
+    message = line_obj.query.filter_by(id=message_id).first()
     db.session.delete(message)
     db.session.commit()
 
