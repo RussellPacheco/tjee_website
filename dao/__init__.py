@@ -19,7 +19,8 @@ def dao_get_member_by_fullname(member_obj, firstname, lastname):
 
 
 def dao_get_member_by_id(member_obj, member_id):
-    result = member_obj.query.filter_by(member_id=member_id)
+    result = member_obj.query.filter_by(id=member_id).first()
+    print(f"Here is the result {result}")
     return result
 
 

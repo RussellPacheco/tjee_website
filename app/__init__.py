@@ -14,8 +14,10 @@ DB_CONNECTION = os.environ.get("DB_CONNECTION")
 SQLALCHEMY_DATABASE = f'postgresql://{DB_CONNECTION}'
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 CORS(app, origins=["http://localhost:8080", "http://localhost:5000"])
 app.config["SQLALCHEMY_DATABASE_URI"] = f'postgresql://{DB_CONNECTION}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 ###

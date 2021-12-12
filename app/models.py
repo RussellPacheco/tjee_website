@@ -8,14 +8,14 @@ class Member(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     firstname = db.Column(db.String(35), nullable=False)
     lastname = db.Column(db.String(35), nullable=False)
-    gender = db.Column(db.Text(1), nullable=False)
-    country = db.Column(db.Text(54), nullable=False)
-    native_lang = db.Column(db.Text(20), nullable=False)
-    lang_focus = db.Column(db.Text(3), nullable=False)
-    line_id = db.Column(db.Text(15), nullable=True)
+    gender = db.Column(db.String(1), nullable=False)
+    country = db.Column(db.String(54), nullable=False)
+    native_lang = db.Column(db.String(20), nullable=False)
+    lang_focus = db.Column(db.String(3), nullable=False)
+    line_id = db.Column(db.String(15), nullable=True)
     line_api_id = db.Column(db.String(40), nullable=True)
-    meetup_id = db.Column(db.Text(10), nullable=True)
-    meetup_name = db.Column(db.Text(25), nullable=True)
+    meetup_id = db.Column(db.String(10), nullable=True)
+    meetup_name = db.Column(db.String(25), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
     last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
 
@@ -23,7 +23,7 @@ class Member(db.Model):
     messages = db.relationship("LineMessage", back_populates="member", lazy=True)
 
     def __repr__(self):
-        return '<Member %r>' % self.first_name
+        return '<Member %r>' % self.firstname
 
 
 class Admin(db.Model):
@@ -45,7 +45,7 @@ class LineMessage(db.Model):
     __tablename__ = "line_messages"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     created_by = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
-    message = db.Column(db.Text(700), nullable=False)
+    message = db.Column(db.String(700), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
     last_sent = db.Column(db.DateTime, default=db.func.now(), nullable=True)
     last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
@@ -59,8 +59,8 @@ class LineMessage(db.Model):
 class NewMembers(db.Model):
     __tablename__ = "new_members"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    meetup_id = db.Column(db.Text(10), nullable=True)
-    meetup_name = db.Column(db.Text(25), nullable=True)
+    meetup_id = db.Column(db.String(10), nullable=True)
+    meetup_name = db.Column(db.String(25), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
 
     def __repr__(self):

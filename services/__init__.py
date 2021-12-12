@@ -161,16 +161,30 @@ def service_admin_create(db, admin_obj, json_data):
 
 
 def service_admin_delete(db, admin_obj, json_data):
-    admin_exist = dao_get_admin_by_username(admin_obj, json_data["username"])
+    admin_to_be_removed_exists = dao_get_admin_by_username(admin_obj, json_data["username_to_be_deleted"])
 
     status = {"status": 1}
 
-    if admin_exist is None:
+    if admin_to_be_removed_exists is None:
         return status
 
-    dao_admin_delete(db, admin_obj, json_data["username"])
-    status["status"] = 0
-    return status
+    admin_exists = dao_get_admin_by_username(admin_obj, json_data["username"])
+
+    if admin_exists is None:
+        return status
+
+    salt = admin_exists.password[:64]
+    stored_password = admin_exists.password[64:]
+    pwdhash = hashlib.pbkdf2_hmac("sha512", json_data["password"].encode("utf-8"), salt.encode("ascii"), 100000)
+    pwdhash = binascii.hexlify(pwdhash).decode("ascii")
+
+    if pwdhash == stored_password:
+        dao_admin_delete(db, admin_obj, json_data["username_to_be_deleted"])
+        status["status"] = 0
+        return status
+    else:
+        status["status"] = -1
+        return status
 
 
 def service_admin_change_password(db, admin_obj, json_data):
@@ -213,7 +227,7 @@ def service_line_create_message(db, line_obj, json_data):
 
     messages = service_line_get_all_messages(line_obj)
 
-    return messages
+    return {"status": 0, "messages": messages}
 
 
 def service_line_send_message(db, line_obj, json_data):
@@ -224,6 +238,11 @@ def service_line_get_all_messages(line_obj):
     data = dao_line_get_all_messages(line_obj)
 
     messages = []
+
+    status = {"status": 1}
+
+    if len(data) == 0:
+        return status
 
     for message in data:
         json_obj = {
@@ -237,7 +256,7 @@ def service_line_get_all_messages(line_obj):
 
         messages.append(json_obj)
 
-    return messages
+    return {"status": 0, "messages": messages}
 
 
 def service_line_get_message(line_obj, message_id):
@@ -249,6 +268,7 @@ def service_line_get_message(line_obj, message_id):
         return status
 
     json_obj = {
+        "status": 0,
         "id": message.id,
         "created_by": message.created_by,
         "message": message.message,
@@ -261,6 +281,13 @@ def service_line_get_message(line_obj, message_id):
 
 
 def service_line_update_message(db, line_obj, message_id, json_data):
+    message = dao_line_get_message(line_obj, message_id)
+
+    status = {"status": 1}
+
+    if message is None:
+        return status
+
     dao_line_update_message(db, line_obj, message_id, json_data["message"])
 
     return service_line_get_message(line_obj, message_id)

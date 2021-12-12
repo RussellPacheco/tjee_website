@@ -4,3 +4,4 @@
 /.flaskenv
 /backend_requirements.txt
 /.backend_requirements.txt.swp
+*__pycache__/
