@@ -28,14 +28,14 @@ class Member(db.Model):
 
 class Admin(db.Model):
     __tablename__ = "admins"
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     member_id = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
     username = db.Column(db.String(65), unique=True, nullable=False)
     password = db.Column(db.String(200), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
     last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
 
-    member = db.relationship("Member", back_populates="admin", lazy=True, cascade="all, delete")
+    member = db.relationship("Member", back_populates="admin", lazy=True)
 
     def __repr__(self):
         return '<Admin %r>' % self.username

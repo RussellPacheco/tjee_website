@@ -37,7 +37,7 @@ def upgrade():
                     sa.PrimaryKeyConstraint("id")
                     )
     op.create_table("admins",
-                    sa.Column("id", sa.Integer(), nullable=False),
+                    sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False, unique=True),
                     sa.Column("member_id", postgresql.UUID(as_uuid=True), nullable=False, unique=True),
                     sa.Column("username", sa.String(length=65), nullable=False),
                     sa.Column("password", sa.String(length=200), nullable=False),
@@ -69,8 +69,8 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table("members")
     op.drop_table("admins")
     op.drop_table("line_messages")
     op.drop_table("new_members")
+    op.drop_table("members")
     pass

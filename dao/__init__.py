@@ -47,7 +47,7 @@ def dao_create_admin(db, admin_obj, member_id, username, password):
 
 
 def dao_admin_delete(db, admin_obj, username):
-    admin = admin_obj.query.filter_by(username).first()
+    admin = admin_obj.query.filter_by(username=username).first()
     db.session.delete(admin)
     db.session.commit()
 
