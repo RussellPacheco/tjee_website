@@ -3,6 +3,10 @@ import hashlib
 import os
 from datetime import datetime
 from dao import *
+from linebot import LineBotApi
+from linebot.exceptions import LineBotApiError
+from linebot.models import TextSendMessage
+
 
 
 #########
@@ -231,7 +235,19 @@ def service_line_create_message(db, line_obj, json_data):
 
 
 def service_line_send_message(db, line_obj, json_data):
-    pass
+    line_bot_api = LineBotApi(os.getenv("CONNECTION_TOKEN"))
+
+    status = {"status": 1}
+
+    try:
+        line_bot_api.push_message(os.getenv("USER_ID"), TextSendMessage(text=json_data["message"]))
+    except LineBotApiError as e:
+        status["error"] = e
+        return status
+
+    dao_line_update_message_time(db, line_obj, json_data["message_id"], datetime.now())
+
+    return status
 
 
 def service_line_get_all_messages(line_obj):
