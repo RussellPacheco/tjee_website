@@ -1,3 +1,5 @@
+import base64
+import hmac
 import binascii
 import hashlib
 import os
@@ -225,6 +227,66 @@ def service_admin_change_password(db, admin_obj, json_data):
 # Line
 #
 #########
+
+def service_line_webhook(headers, body, json_data):
+
+    # Useful 'type'
+    #
+    # message - Webhook event object which contains the sent message.
+    # follow - Event object for when your LINE Official Account is added as a friend (or unblocked).
+    # unfollow - Event object for when your LINE Official Account is blocked.
+    # join - Event object for when your LINE Official Account joins a group or room. You can reply to join events.
+    # leave - Event object for when a user removes your LINE Official Account from a group or when your LINE Official Account leaves a group or room.
+    # memberJoined - Event object for when a user joins a group or room that the LINE Official Account is in.
+    # memberLeft - Event object for when a user leaves a group or room that the LINE Official Account is in.
+
+    # Example webhook event
+    # {
+    #     "destination": "xxxxxxxxxx",
+    #     "events": [
+    #         {
+    #             "type": "message",
+    #             "message": {
+    #                 "type": "text",
+    #                 "id": "14353798921116",
+    #                 "text": "Hello, world"
+    #             },
+    #             "timestamp": 1625665242211,
+    #             "source": {
+    #                 "type": "user",
+    #                 "userId": "U80696558e1aa831..."
+    #             },
+    #             "replyToken": "757913772c4646b784d4b7ce46d12671",
+    #             "mode": "active"
+    #         },
+    #         {
+    #             "type": "follow",
+    #             "timestamp": 1625665242214,
+    #             "source": {
+    #                 "type": "user",
+    #                 "userId": "Ufc729a925b3abef..."
+    #             },
+    #             "replyToken": "bb173f4d9cf64aed9d408ab4e36339ad",
+    #             "mode": "active"
+    #         },
+    #         {
+    #             "type": "unfollow",
+    #             "timestamp": 1625665242215,
+    #             "source": {
+    #                 "type": "user",
+    #                 "userId": "Ubbd4f124aee5113..."
+    #             },
+    #             "mode": "active"
+    #         }
+    #     ]
+    # }
+
+    channel_secret = os.getenv("CHANNEL_SECRET")
+    hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
+    signature = base64.b85decode(hash)
+
+    # if signature == headers['x-line-signature']:
+
 
 def service_line_create_message(db, line_obj, json_data):
     dao_line_create_message(db, line_obj, json_data["created_by"], json_data["message"])

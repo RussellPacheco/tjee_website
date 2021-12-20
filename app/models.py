@@ -5,19 +5,19 @@ import uuid
 
 class Member(db.Model):
     __tablename__ = "members"
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    firstname = db.Column(db.String(35), nullable=False)
-    lastname = db.Column(db.String(35), nullable=False)
-    gender = db.Column(db.String(1), nullable=False)
-    country = db.Column(db.String(54), nullable=False)
-    native_lang = db.Column(db.String(20), nullable=False)
-    lang_focus = db.Column(db.String(3), nullable=False)
-    line_id = db.Column(db.String(15), nullable=True)
-    line_api_id = db.Column(db.String(40), nullable=True)
-    meetup_id = db.Column(db.String(10), nullable=True)
-    meetup_name = db.Column(db.String(25), nullable=True)
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
+    id = db.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    firstname = db.Column("firstname", db.String(35), nullable=False)
+    lastname = db.Column("lastname", db.String(35), nullable=False)
+    gender = db.Column("gender", db.String(1), nullable=False)
+    country = db.Column("country", db.String(54), nullable=False)
+    native_lang = db.Column("native_lang", db.String(20), nullable=False)
+    lang_focus = db.Column("lang_focus", db.String(3), nullable=False)
+    line_id = db.Column("line_id", db.String(15), nullable=True, unique=True)
+    line_api_id = db.Column("line_api_id", db.String(40), nullable=True, unique=True)
+    meetup_id = db.Column("meetup_id", db.String(10), nullable=True, unique=True)
+    meetup_name = db.Column("meetup_name", db.String(25), nullable=True)
+    created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)
+    last_modified = db.Column("last_modified", db.DateTime, default=db.func.now(), nullable=True)
 
     admin = db.relationship("Admin", back_populates="member", lazy=True, cascade="all, delete")
     messages = db.relationship("LineMessage", back_populates="member", lazy=True)
@@ -28,13 +28,12 @@ class Member(db.Model):
 
 class Admin(db.Model):
     __tablename__ = "admins"
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    member_id = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
-    username = db.Column(db.String(65), unique=True, nullable=False)
-    password = db.Column(db.String(200), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
-
+    id = db.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    member_id = db.Column("member_id", UUID(as_uuid=True), db.ForeignKey("members.id", ondelete="CASCADE"), nullable=False, unique=True)
+    username = db.Column("username", db.String(65), unique=True, nullable=False)
+    password = db.Column("password", db.String(200), unique=True, nullable=False)
+    created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)
+    last_modified = db.Column("last_modified", db.DateTime, default=db.func.now(), nullable=True)
     member = db.relationship("Member", back_populates="admin", lazy=True)
 
     def __repr__(self):
@@ -43,12 +42,12 @@ class Admin(db.Model):
 
 class LineMessage(db.Model):
     __tablename__ = "line_messages"
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    created_by = db.Column(UUID(as_uuid=True), db.ForeignKey("members.id"), nullable=False)
-    message = db.Column(db.String(700), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_sent = db.Column(db.DateTime, default=db.func.now(), nullable=True)
-    last_modified = db.Column(db.DateTime, default=db.func.now(), nullable=True)
+    id = db.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_by = db.Column("created_by", UUID(as_uuid=True), db.ForeignKey("members.id", ondelete="SET NULL"), nullable=False)
+    message = db.Column("message", db.String(700), nullable=False)
+    created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)
+    last_sent = db.Column("last_sent", db.DateTime, default=db.func.now(), nullable=True)
+    last_modified = db.Column("last_modified", db.DateTime, default=db.func.now(), nullable=True)
 
     member = db.relationship("Member", back_populates="messages", lazy=True)
 
@@ -58,10 +57,23 @@ class LineMessage(db.Model):
 
 class NewMembers(db.Model):
     __tablename__ = "new_members"
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    meetup_id = db.Column(db.String(10), nullable=True)
-    meetup_name = db.Column(db.String(25), nullable=True)
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    id = db.Column("id", db.Integer, primary_key=True, nullable=False)
+    meetup_id = db.Column("meetup_id", db.String(10), nullable=True, unique=True)
+    meetup_name = db.Column("meetup_name", db.String(25), nullable=True)
+    created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)
 
     def __repr__(self):
         return '<NewMember %r>' % self.meetup_name
+
+
+class LineWebhooks(db.Model):
+    __tablename__ = "line_webhooks"
+    id = db.Column("id", db.Integer, primary_key=True, nullable=False)
+    type = db.Column("type", db.String(14), nullable=False)
+    userId = db.Column("userId", db.String(40), nullable=True)
+    timestamp = db.Column("timestamp", db.Integer, nullable=False)
+    groupId = db.Column("groupId", db.String(40), nullable=True)
+
+    def __repr__(self):
+        return '<LineWebhook %r>' % self.type
+
