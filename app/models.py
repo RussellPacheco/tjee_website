@@ -78,3 +78,15 @@ class LineWebhooks(db.Model):
     def __repr__(self):
         return '<LineWebhook %r>' % self.type
 
+
+class BotPermissions(db.Model):
+    __tablename__ = "bot_permissions"
+    id = db.Column("id", db.Integer, primary_key=True, nullable=False)
+    permission_name = db.Column("permission_name", db.Boolean, nullable=False)
+    permission_value = db.Column("permission_value", db.Boolean, nullable=False)
+    last_modified = db.Column("last_modified", db.DateTime, default=db.func.now(), nullable=True)
+
+    def __repr__(self):
+        return '<BotPermission %r>' %self.permission_name
+
+

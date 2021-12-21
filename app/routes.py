@@ -1,7 +1,7 @@
 from app import app
 from controllers import *
 from app import db
-from app.models import Member, Admin, LineMessage, NewMembers, LineWebhooks
+from app.models import Member, Admin, LineMessage, NewMembers, LineWebhooks, BotPermissions
 from flask import request, Response
 
 
@@ -18,7 +18,7 @@ def index():
 
 @app.route("/api/members/create/", methods=["POST"])
 def member_create():
-    data = controller_create_member(db, Member, request.json)
+    data = controller_create_member(db, Member, request.get_json())
     return data
 
 
@@ -42,25 +42,25 @@ def member_get_all():
 
 @app.route("/api/admins/login/", methods=["POST"])
 def admin_login():
-    data = controller_admin_login(Admin, request.json)
+    data = controller_admin_login(Admin, request.get_json())
     return data
 
 
 @app.route("/api/admins/create/", methods=["POST"])
 def admin_create():
-    data = controller_admin_create(db, Admin, request.json)
+    data = controller_admin_create(db, Admin, request.get_json())
     return data
 
 
 @app.route("/api/admins/delete/", methods=["DELETE"])
 def admin_delete():
-    data = controller_admin_delete(db, Admin, request.json)
+    data = controller_admin_delete(db, Admin, request.get_json())
     return data
 
 
 @app.route("/api/admins/password/", methods=["POST"])
 def admin_change_password():
-    data = controller_admin_change_password(db, Admin, request.json)
+    data = controller_admin_change_password(db, Admin, request.get_json())
     return data
 
 
@@ -72,20 +72,32 @@ def admin_change_password():
 
 @app.route("/api/line/", methods=["POST"])
 def webhook():
-    data = controller_line_webhook(db, LineWebhooks, request.headers, request.body, request.json)
-    # data = controller_line_webhook(db, LineWebhooks, request.json)
+    data = controller_line_webhook(db, LineWebhooks, BotPermissions, request.headers, request.get_json())
+    # data = controller_line_webhook(db, LineWebhooks, request.get_json())
+    return data
+
+
+@app.route("/api/line/bot/<permission>", methods=["POST"])
+def change_bot_permissions(permission):
+    data = controller_line_change_bot_permission(db, BotPermissions, permission, request.get_json())
+    return data
+
+
+@app.route("/api/line/bot/", methods=["GET"])
+def get_bot_permissions():
+    data = controller_line_get_bot_permissions(BotPermissions)
     return data
 
 
 @app.route("/api/line/messages/create/", methods=["POST"])
 def message_create():
-    data = controller_line_create_message(db, LineMessage, request.json)
+    data = controller_line_create_message(db, LineMessage, request.get_json())
     return data
 
 
 @app.route("/api/line/messages/send/", methods=["POST"])
 def message_send():
-    data = controller_line_send_message(db, LineMessage, request.json)
+    data = controller_line_send_message(db, LineMessage, request.get_json())
     return data
 
 
@@ -103,7 +115,7 @@ def message_get(message_id):
 
 @app.route("/api/line/messages/message/<message_id>/", methods=["POST"])
 def message_update(message_id):
-    data = controller_line_update_message(db, LineMessage, message_id, request.json)
+    data = controller_line_update_message(db, LineMessage, message_id, request.get_json())
     return data
 
 

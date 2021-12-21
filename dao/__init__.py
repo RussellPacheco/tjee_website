@@ -94,6 +94,20 @@ def dao_line_get_webhook(webhook_obj, userId=None, groupId=None, line_type=None)
         return result
 
 
+def dao_line_get_bot_permission(bot_permission_obj, permission_name):
+    result = bot_permission_obj.query.filter_by(permission_name=permission_name).first()
+    return result
+
+
+def dao_line_get_all_bot_permissions(bot_permission_obj):
+    result = bot_permission_obj.query.all()
+    return result
+
+def dao_line_change_bot_permission(db, bot_permission_obj, permission_name, permission, last_modified):
+    bot_permission_obj.query.filter_by(permission_name=permission_name).update(dict(permission=permission, last_modified=last_modified))
+    db.session.commit()
+
+
 def dao_line_create_message(db, line_obj, created_by, message):
     new_message = line_obj(created_by=created_by, message=message)
     db.session.add(new_message)

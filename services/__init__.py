@@ -5,10 +5,7 @@ import hashlib
 import os
 from datetime import datetime
 from dao import *
-from linebot import LineBotApi
-from linebot.exceptions import LineBotApiError
-from linebot.models import TextSendMessage
-
+from .utils import send_message
 
 
 #########
@@ -228,7 +225,7 @@ def service_admin_change_password(db, admin_obj, json_data):
 #
 #########
 
-def service_line_webhook(db, webhook_obj, headers, body, json_data):
+def service_line_webhook(db, webhook_obj, bot_permission_obj, headers, json_data):
 # def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'
@@ -287,7 +284,7 @@ def service_line_webhook(db, webhook_obj, headers, body, json_data):
     # }
 
     channel_secret = os.getenv("CHANNEL_SECRET")
-    header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
+    header_hash = hmac.new(channel_secret.encode('utf-8'), json_data.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b85decode(header_hash)
 
     if signature == headers['x-line-signature']:
@@ -295,27 +292,82 @@ def service_line_webhook(db, webhook_obj, headers, body, json_data):
 
         for event in json_data["events"]:
 
-            timestamp = datetime.fromtimestamp(event["timestamp"] / 1000.0)
+            EVENT_TYPE = event["type"] if hasattr(event, "type") else None
+            TIMESTAMP = datetime.fromtimestamp(event["timestamp"] / 1000.0) if hasattr(event, "timestamp") else None
+            USER_ID = event["source"]["userId"] if hasattr(event["source"], "userId") else None
+            GROUP_ID = event["source"]["groupId"] if hasattr(event["source"], "groupId") else None
 
-            if event["type"] in ["follow", "unfollow"]:
-                dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=timestamp, userId=event["source"]["userId"])
-            elif event["type"] in ["leave", "memberJoined", "memberLeft"]:
-                dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=timestamp, groupId=event["source"]["groupId"], userId=event["source"]["userId"])
-            elif event["type"] == "message":
-                exists = dao_line_get_webhook(webhook_obj, line_type=event["type"], userId=event["source"]["userId"])
-                if exists is None:
-                    dao_line_save_webhook(db, webhook_obj, line_type="message", timestamp=timestamp, userId=event["source"]["userId"], message=event["message"]["text"])
+            if EVENT_TYPE in ["follow", "unfollow", "message"]:
+                if EVENT_TYPE == "message":
+                    exists = dao_line_get_webhook(webhook_obj, line_type=EVENT_TYPE, userId=USER_ID)
+                    if exists is None:
+                        dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID, message=event["message"]["text"])
+                else:
+                    dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID)
+            elif EVENT_TYPE in ["join", "leave", "memberJoined", "memberLeft"]:
+                dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, groupId=GROUP_ID, userId=USER_ID)
+                if EVENT_TYPE == "join":
+                    allowed = dao_line_get_bot_permission(bot_permission_obj, permission_name="group_join")
+                    if allowed.permission:
+
+                        text = """
+                        
+                        Thank you for inviting me! 
+                        
+                        """
+
+                        send_message("reply", event["replyToken"], text)
 
                 # I WILL LEAVE THIS HERE IN CASE I NEED THIS IN THE FUTURE
                 # elif event["source"]["type"] == "room":
                 #     exists = dao_line_get_webhook(webhook_obj, roomId=event["source"]["roomId"])
                 #
-                #     if exists is None:
-                #         dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=event["timestamp"], roomId=event["source"]["roomId"])
+                # if exists is None: dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE,
+                # timestamp=TIMESTAMP, roomId=event["source"]["roomId"])
+
             status["status"] = 0
             return status
         else:
             return status
+
+
+def service_line_change_bot_permission(db, bot_permission_obj, permission, json_data):
+
+    status = {"status": 1}
+    permission_name = json_data["permission_name"]
+    last_modified = datetime.now()
+
+    exists = dao_line_get_bot_permission(bot_permission_obj, permission_name=permission_name)
+
+    if exists:
+        dao_line_change_bot_permission(db, bot_permission_obj, permission_name=permission_name, permission=permission, last_modified=last_modified)
+        status["status"] = 0
+        return status
+    else:
+        return status
+
+
+def service_line_get_bot_permissions(bot_permission_obj):
+    data = dao_line_get_all_bot_permissions(bot_permission_obj)
+
+    permissions = []
+
+    status = {"status": 1}
+
+    if len(data) == 0:
+        return status
+
+    for permission in data:
+        json_obj = {
+            "id": permission.id,
+            "permission_name": permission.permission_name,
+            "message": permission.permission_value,
+            "last_modified": permission.last_modified
+        }
+
+        permissions.append(json_obj)
+
+    return {"status": 0, "permissions": permissions}
 
 
 def service_line_create_message(db, line_obj, json_data):
@@ -327,14 +379,15 @@ def service_line_create_message(db, line_obj, json_data):
 
 
 def service_line_send_message(db, line_obj, json_data):
-    line_bot_api = LineBotApi(os.getenv("CONNECTION_TOKEN"))
 
     status = {"status": 1}
+    MESSAGE = json_data["message"]
+    DESTINATION = json_data["destination"]
 
-    try:
-        line_bot_api.push_message(os.getenv("USER_ID"), TextSendMessage(text=json_data["message"]))
-    except LineBotApiError as e:
-        status["error"] = e
+    result = send_message("push", DESTINATION, MESSAGE)
+
+    if result != 0:
+        status["error"] = result
         return status
 
     dao_line_update_message_time(db, line_obj, json_data["message_id"], datetime.now())
@@ -420,7 +473,7 @@ def service_line_delete_message(db, line_obj, message_id):
 #########
 
 def service_get_new_member_application(db, new_members_obj):
-    new_members_db_list = dao_get_all_new_members(new_members_obj)
+    # new_members_db_list = dao_get_all_new_members(new_members_obj)
 
     # something like all_apps = mercari_check_new_applications()
     # and then
