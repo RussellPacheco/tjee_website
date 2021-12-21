@@ -20,7 +20,6 @@ def dao_get_member_by_fullname(member_obj, firstname, lastname):
 
 def dao_get_member_by_id(member_obj, member_id):
     result = member_obj.query.filter_by(id=member_id).first()
-    print(f"Here is the result {result}")
     return result
 
 
@@ -63,6 +62,37 @@ def dao_admin_change_password(db, admin_obj, username, password):
 # Line
 #
 #########
+
+def dao_line_save_webhook(db, webhook_obj, line_type, timestamp, userId=None, groupId=None, message=None):
+
+    if line_type in ["leave", "memberJoined", "memberLeft"]:
+        new_webhook = webhook_obj(type=line_type, timestamp=timestamp, groupId=groupId, userId=userId)
+        db.session.add(new_webhook)
+        db.session.commit()
+
+    elif line_type in ["follow", "unfollow"]:
+        new_webhook = webhook_obj(type=line_type, timestamp=timestamp, userId=userId)
+        db.session.add(new_webhook)
+        db.session.commit()
+
+    elif line_type == "message":
+        new_message = webhook_obj(type=line_type, timestamp=timestamp, userId=userId, message=message)
+        db.session.add(new_message)
+        db.session.commit()
+
+
+def dao_line_get_webhook(webhook_obj, userId=None, groupId=None, line_type=None):
+
+    if line_type in ["leave", "memberJoined", "memberLeft"]:
+        result = webhook_obj.query.filter_by(type=line_type, groupId=groupId).order_by(webhook_obj.timestamp).first()
+        return result
+
+    elif line_type in ["follow", "unfollow", "message"]:
+
+        result = webhook_obj.query.filter_by(type=line_type, userId=userId).first()
+
+        return result
+
 
 def dao_line_create_message(db, line_obj, created_by, message):
     new_message = line_obj(created_by=created_by, message=message)

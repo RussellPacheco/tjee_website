@@ -84,12 +84,15 @@ def controller_admin_change_password(db, admin_obj, json_data):
 #
 #########
 
-def controller_line_webhook(headers, body, json_data):
+def controller_line_webhook(db, webhook_obj, headers, body, json_data):
+# def controller_line_webhook(db, webhook_obj, json_data):
     try:
-        data = service_line_webhook(headers, body, json_data)
+        data = service_line_webhook(db, webhook_obj, headers, body, json_data)
+        # data = service_line_webhook(db, webhook_obj, json_data)
         return data
     except Exception as e:
         return e
+
 
 def controller_line_create_message(db, line_obj, json_data):
     try:

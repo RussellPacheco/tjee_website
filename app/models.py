@@ -71,8 +71,9 @@ class LineWebhooks(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, nullable=False)
     type = db.Column("type", db.String(14), nullable=False)
     userId = db.Column("userId", db.String(40), nullable=True)
-    timestamp = db.Column("timestamp", db.Integer, nullable=False)
+    timestamp = db.Column("timestamp", db.DateTime, nullable=False)
     groupId = db.Column("groupId", db.String(40), nullable=True)
+    message = db.Column("message", db.String(200), nullable=True)
 
     def __repr__(self):
         return '<LineWebhook %r>' % self.type

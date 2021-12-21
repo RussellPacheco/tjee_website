@@ -1,7 +1,7 @@
 from app import app
 from controllers import *
 from app import db
-from app.models import Member, Admin, LineMessage, NewMembers
+from app.models import Member, Admin, LineMessage, NewMembers, LineWebhooks
 from flask import request, Response
 
 
@@ -70,9 +70,10 @@ def admin_change_password():
 #
 #########
 
-@app.route("/api/line", methods=["POST"])
+@app.route("/api/line/", methods=["POST"])
 def webhook():
-    data = controller_line_webhook(request.headers, request.body, request.json)
+    data = controller_line_webhook(db, LineWebhooks, request.headers, request.body, request.json)
+    # data = controller_line_webhook(db, LineWebhooks, request.json)
     return data
 
 

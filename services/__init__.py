@@ -228,17 +228,22 @@ def service_admin_change_password(db, admin_obj, json_data):
 #
 #########
 
-def service_line_webhook(headers, body, json_data):
+def service_line_webhook(db, webhook_obj, headers, body, json_data):
+# def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'
     #
     # message - Webhook event object which contains the sent message.
+    # join - Event object for when your LINE Account joins a group or room. You can reply to join events.
+
     # follow - Event object for when your LINE Official Account is added as a friend (or unblocked).
     # unfollow - Event object for when your LINE Official Account is blocked.
-    # join - Event object for when your LINE Official Account joins a group or room. You can reply to join events.
+    # just userId
+
     # leave - Event object for when a user removes your LINE Official Account from a group or when your LINE Official Account leaves a group or room.
     # memberJoined - Event object for when a user joins a group or room that the LINE Official Account is in.
     # memberLeft - Event object for when a user leaves a group or room that the LINE Official Account is in.
+    # userId, groupId
 
     # Example webhook event
     # {
@@ -282,10 +287,35 @@ def service_line_webhook(headers, body, json_data):
     # }
 
     channel_secret = os.getenv("CHANNEL_SECRET")
-    hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
-    signature = base64.b85decode(hash)
+    header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
+    signature = base64.b85decode(header_hash)
 
-    # if signature == headers['x-line-signature']:
+    if signature == headers['x-line-signature']:
+        status = {"status": 1}
+
+        for event in json_data["events"]:
+
+            timestamp = datetime.fromtimestamp(event["timestamp"] / 1000.0)
+
+            if event["type"] in ["follow", "unfollow"]:
+                dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=timestamp, userId=event["source"]["userId"])
+            elif event["type"] in ["leave", "memberJoined", "memberLeft"]:
+                dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=timestamp, groupId=event["source"]["groupId"], userId=event["source"]["userId"])
+            elif event["type"] == "message":
+                exists = dao_line_get_webhook(webhook_obj, line_type=event["type"], userId=event["source"]["userId"])
+                if exists is None:
+                    dao_line_save_webhook(db, webhook_obj, line_type="message", timestamp=timestamp, userId=event["source"]["userId"], message=event["message"]["text"])
+
+                # I WILL LEAVE THIS HERE IN CASE I NEED THIS IN THE FUTURE
+                # elif event["source"]["type"] == "room":
+                #     exists = dao_line_get_webhook(webhook_obj, roomId=event["source"]["roomId"])
+                #
+                #     if exists is None:
+                #         dao_line_save_webhook(db, webhook_obj, line_type=event["type"], timestamp=event["timestamp"], roomId=event["source"]["roomId"])
+            status["status"] = 0
+            return status
+        else:
+            return status
 
 
 def service_line_create_message(db, line_obj, json_data):
