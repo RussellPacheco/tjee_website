@@ -290,6 +290,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, headers, json_data
     signature = base64.b85decode(header_hash)
 
     if signature == headers['x-line-signature']:
+        print("Inside the if statement")
         status = {"status": 1}
 
         for event in json_data["events"]:
