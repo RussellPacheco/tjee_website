@@ -72,7 +72,7 @@ def admin_change_password():
 
 @app.route("/api/line/", methods=["POST"])
 def webhook():
-    data = controller_line_webhook(db, LineWebhooks, BotPermissions, request.headers, request.get_json())
+    data = controller_line_webhook(db=db, webhook_obj=LineWebhooks, bot_permission_obj=BotPermissions, body=request.get_data(), headers=request.headers, json_data=request.get_json())
     # data = controller_line_webhook(db, LineWebhooks, request.get_json())
     return data
 
