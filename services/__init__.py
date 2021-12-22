@@ -225,7 +225,7 @@ def service_admin_change_password(db, admin_obj, json_data):
 #
 #########
 
-def service_line_webhook(db, webhook_obj, bot_permission_obj, headers, body, json_data):
+def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
 
     print("GOT A WEBHOOK")
 # def service_line_webhook(db, webhook_obj, json_data):
@@ -287,7 +287,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, headers, body, jso
 
     channel_secret = os.getenv("CHANNEL_SECRET")
     header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
-    signature = base64.b85decode(header_hash)
+    signature = base64.b64encode(header_hash)
 
     if signature == headers['x-line-signature']:
         print("Inside the if statement")
