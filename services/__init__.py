@@ -289,7 +289,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(header_hash)
 
-    header = "b'"+ headers['x-line-signature']+"'"
+    header = "b'" + headers['x-line-signature']+ "'"
 
     if str(signature) == header:
         print("Inside the if statement")
@@ -300,6 +300,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
         for event in json_data["events"]:
 
             print(f"Event is {event}")
+            print(f"Event type is {type(event)}")
 
             if hasattr(event, "type"):
                 EVENT_TYPE = event["type"]
@@ -320,6 +321,10 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
                 GROUP_ID = event["source"]["groupId"]
             else:
                 GROUP_ID = None
+
+            print(f"Event type is {EVENT_TYPE}")
+            print(f"Timestamp is {TIMESTAMP}")
+            print(f"USER_ID is {USER_ID}")
 
             if EVENT_TYPE in ["follow", "unfollow", "message"]:
                 if EVENT_TYPE == "message":
