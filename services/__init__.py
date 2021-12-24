@@ -292,7 +292,9 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     print(f"Header has is: {headers['x-line-signature']}")
     print(f"Signature is: {signature}")
 
-    if signature == headers['x-line-signature']:
+    header = "b'"+header_hash['x-line-signature']+"'"
+
+    if signature == header:
         print("Inside the if statement")
         status = {"status": 1}
 
