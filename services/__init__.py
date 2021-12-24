@@ -302,25 +302,26 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
             print(f"Event is {event}")
             print(f"Event type is {type(event)}")
 
-            if hasattr(event, "type"):
+            if "type" in event:
                 EVENT_TYPE = event["type"]
             else:
                 EVENT_TYPE = None
 
-            if hasattr(event, "timestamp"):
+            if "timestamp" in event:
                 TIMESTAMP = datetime.fromtimestamp(event["timestamp"] / 1000.0)
             else:
                 TIMESTAMP = None
 
-            if hasattr(event["source"], "userId"):
-                USER_ID = event["source"]["userId"]
-            else:
-                USER_ID = None
+            if "source" in event:
+                if "userId" in event["source"]:
+                    USER_ID = event["source"]["userId"]
+                else:
+                    USER_ID = None
 
-            if hasattr(event["source"], "groupId"):
-                GROUP_ID = event["source"]["groupId"]
-            else:
-                GROUP_ID = None
+                if "groupId" in event["source"]:
+                    GROUP_ID = event["source"]["groupId"]
+                else:
+                    GROUP_ID = None
 
             print(f"Event type is {EVENT_TYPE}")
             print(f"Timestamp is {TIMESTAMP}")
