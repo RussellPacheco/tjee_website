@@ -291,25 +291,35 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
 
     header = "b'"+ headers['x-line-signature']+"'"
 
-    print(f"Header has is: {header}")
-    print(f"Signature is: {signature}")
-    print(f"header type {type(header)}, signature type {type(signature)}")
-
     if str(signature) == header:
         print("Inside the if statement")
         status = {"status": 1}
 
         print(f"json_data is {json_data}")
 
-
         for event in json_data["events"]:
 
             print(f"Event is {event}")
 
-            EVENT_TYPE = event["type"] if hasattr(event, "type") else None
-            TIMESTAMP = datetime.fromtimestamp(event["timestamp"] / 1000.0) if hasattr(event, "timestamp") else None
-            USER_ID = event["source"]["userId"] if hasattr(event["source"], "userId") else None
-            GROUP_ID = event["source"]["groupId"] if hasattr(event["source"], "groupId") else None
+            if hasattr(event, "type"):
+                EVENT_TYPE = event["type"]
+            else:
+                EVENT_TYPE = None
+
+            if hasattr(event, "timestamp"):
+                TIMESTAMP = datetime.fromtimestamp(event["timestamp"] / 1000.0)
+            else:
+                TIMESTAMP = None
+
+            if hasattr(event["source"], "userId"):
+                USER_ID = event["source"]["userId"]
+            else:
+                USER_ID = None
+
+            if hasattr(event["source"], "groupId"):
+                GROUP_ID = event["source"]["groupId"]
+            else:
+                GROUP_ID = None
 
             if EVENT_TYPE in ["follow", "unfollow", "message"]:
                 if EVENT_TYPE == "message":
