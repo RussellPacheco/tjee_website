@@ -101,6 +101,7 @@ def controller_line_change_bot_permission(db, bot_permission_obj, permission, js
     except Exception as e:
         return str(e)
 
+
 def controller_line_get_bot_permissions(bot_permission_obj):
     try:
         data = service_line_get_bot_permissions(bot_permission_obj)

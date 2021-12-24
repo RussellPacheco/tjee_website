@@ -64,8 +64,9 @@ def dao_admin_change_password(db, admin_obj, username, password):
 #########
 
 def dao_line_save_webhook(db, webhook_obj, line_type, timestamp, userId=None, groupId=None, message=None):
-
+    print("in dao_line_save_webhook")
     if line_type in ["leave", "memberJoined", "memberLeft"]:
+        print("in if statement for dao")
         new_webhook = webhook_obj(type=line_type, timestamp=timestamp, groupId=groupId, userId=userId)
         db.session.add(new_webhook)
         db.session.commit()

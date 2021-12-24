@@ -313,8 +313,10 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
 
             if EVENT_TYPE in ["follow", "unfollow", "message"]:
                 if EVENT_TYPE == "message":
+                    print("in message if statement")
                     exists = dao_line_get_webhook(webhook_obj, line_type=EVENT_TYPE, userId=USER_ID)
                     if exists is None:
+                        print("message doesnt exists")
                         dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID, message=event["message"]["text"])
                 else:
                     dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID)
