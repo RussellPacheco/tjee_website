@@ -289,7 +289,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(header_hash)
 
-    header = "b'"+header_hash['x-line-signature']+"'"
+    header = "b'"+ headers['x-line-signature']+"'"
 
     print(f"Header has is: {header}")
     print(f"Signature is: {signature}")
