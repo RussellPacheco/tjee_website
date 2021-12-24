@@ -299,7 +299,12 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
         print("Inside the if statement")
         status = {"status": 1}
 
+        print(f"json_data is {json_data}")
+
+
         for event in json_data["events"]:
+
+            print(f"Event is {event}")
 
             EVENT_TYPE = event["type"] if hasattr(event, "type") else None
             TIMESTAMP = datetime.fromtimestamp(event["timestamp"] / 1000.0) if hasattr(event, "timestamp") else None
