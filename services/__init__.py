@@ -289,7 +289,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(header_hash)
 
-    print(f"Header has is: {header_hash}")
+    print(f"Header has is: {headers['x-line-signature']}")
     print(f"Signature is: {signature}")
 
     if signature == headers['x-line-signature']:
@@ -335,6 +335,8 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
             return status
         else:
             return status
+
+    return {"status": 1}
 
 
 def service_line_change_bot_permission(db, bot_permission_obj, permission, json_data):
