@@ -227,7 +227,6 @@ def service_admin_change_password(db, admin_obj, json_data):
 
 def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
 
-    print("GOT A WEBHOOK")
 # def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'
@@ -289,18 +288,12 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     header_hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
     signature = base64.b64encode(header_hash)
 
-    header = "b'" + headers['x-line-signature']+ "'"
+    header = "b'" + headers['x-line-signature'] + "'"
 
     if str(signature) == header:
-        print("Inside the if statement")
         status = {"status": 1}
 
-        print(f"json_data is {json_data}")
-
         for event in json_data["events"]:
-
-            print(f"Event is {event}")
-            print(f"Event type is {type(event)}")
 
             if "type" in event:
                 EVENT_TYPE = event["type"]
@@ -323,16 +316,10 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
                 else:
                     GROUP_ID = None
 
-            print(f"Event type is {EVENT_TYPE}")
-            print(f"Timestamp is {TIMESTAMP}")
-            print(f"USER_ID is {USER_ID}")
-
             if EVENT_TYPE in ["follow", "unfollow", "message"]:
                 if EVENT_TYPE == "message":
-                    print("in message if statement")
                     exists = dao_line_get_webhook(webhook_obj, line_type=EVENT_TYPE, userId=USER_ID)
                     if exists is None:
-                        print("message doesnt exists")
                         dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID, message=event["message"]["text"])
                 else:
                     dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID)
