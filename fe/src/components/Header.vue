@@ -18,7 +18,7 @@
             </b-nav-item-dropdown>
 
             <b-nav-item-dropdown v-if="this.$store.state.adminLogin" text="Bot" right>
-            <b-dropdown-item href="#">Permissions</b-dropdown-item>
+            <b-dropdown-item :to="{name: 'Permissions'}">Permissions</b-dropdown-item>
             </b-nav-item-dropdown>
 
             <b-nav-item-dropdown text="User" right>

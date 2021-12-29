@@ -131,6 +131,7 @@ def controller_line_send_message(db, line_obj, json_data):
 def controller_line_get_all_messages(line_obj):
     try:
         data = service_line_get_all_messages(line_obj)
+
         return data
 
     except Exception as e:

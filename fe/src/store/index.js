@@ -6,6 +6,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     adminLogin: false,
+    botPermissions: [
+      {
+        permission_name: "default_name",
+        permission_value: false
+      }
+    ],
     messages: [
       {
         id: 1, 

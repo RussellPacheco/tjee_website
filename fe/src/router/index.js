@@ -7,6 +7,7 @@ import NewMessage from "../views/Line/NewMessage"
 import ViewMessages from "../views/Line/ViewMessages"
 import SendMessage from "../views/Line/SendMessage"
 import EditMessage from "../views/Line/EditMessage"
+import Permissions from "../views/Bot/Permissions"
 
 Vue.use(VueRouter)
 
@@ -46,7 +47,11 @@ const routes = [
     name: 'EditMessage',
     component: EditMessage
   },
-
+  {
+    path: '/bot/permissions',
+    name: 'Permissions',
+    component: Permissions
+  }
 ]
 
 const router = new VueRouter({
