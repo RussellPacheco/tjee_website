@@ -352,16 +352,17 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
     return {"status": 1}
 
 
-def service_line_change_bot_permission(db, bot_permission_obj, permission, json_data):
+def service_line_change_bot_permission(db, bot_permission_obj, json_data):
 
     status = {"status": 1}
     permission_name = json_data["permission_name"]
+    permission_value = json_data["permission_value"]
     last_modified = datetime.now()
 
     exists = dao_line_get_bot_permission(bot_permission_obj, permission_name=permission_name)
 
     if exists:
-        dao_line_change_bot_permission(db, bot_permission_obj, permission_name=permission_name, permission=permission, last_modified=last_modified)
+        dao_line_change_bot_permission(db, bot_permission_obj, permission_name=permission_name, permission_value=permission_value, last_modified=last_modified)
         status["status"] = 0
         return status
     else:

@@ -94,9 +94,9 @@ def controller_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, 
         return str(e)
 
 
-def controller_line_change_bot_permission(db, bot_permission_obj, permission, json_data):
+def controller_line_change_bot_permission(db, bot_permission_obj, json_data):
     try:
-        data = service_line_change_bot_permission(db, bot_permission_obj, permission, json_data)
+        data = service_line_change_bot_permission(db, bot_permission_obj, json_data)
         return data
     except Exception as e:
         return str(e)

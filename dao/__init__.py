@@ -104,8 +104,9 @@ def dao_line_get_all_bot_permissions(bot_permission_obj):
     result = bot_permission_obj.query.all()
     return result
 
-def dao_line_change_bot_permission(db, bot_permission_obj, permission_name, permission, last_modified):
-    bot_permission_obj.query.filter_by(permission_name=permission_name).update(dict(permission=permission, last_modified=last_modified))
+
+def dao_line_change_bot_permission(db, bot_permission_obj, permission_name, permission_value, last_modified):
+    bot_permission_obj.query.filter_by(permission_name=permission_name).update(dict(permission_value=permission_value, last_modified=last_modified))
     db.session.commit()
 
 

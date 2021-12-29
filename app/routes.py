@@ -77,9 +77,9 @@ def webhook():
     return data
 
 
-@app.route("/api/line/bot/<permission>", methods=["POST"])
-def change_bot_permissions(permission):
-    data = controller_line_change_bot_permission(db, BotPermissions, permission, request.get_json())
+@app.route("/api/line/bot/", methods=["POST"])
+def change_bot_permissions():
+    data = controller_line_change_bot_permission(db, BotPermissions, request.get_json())
     return data
 
 
