@@ -5,15 +5,25 @@
             <b-nav-item :to="{name: 'Home'}">Home</b-nav-item>
 
             <!-- Navbar dropdowns -->
-            <b-nav-item-dropdown text="Menu" right>
-            <b-dropdown-item href="#">Open</b-dropdown-item>
+            <b-nav-item-dropdown v-if="this.$store.state.adminLogin" text="Members" right>
+            <b-dropdown-item href="#">Add</b-dropdown-item>
             <b-dropdown-item href="#">Edit</b-dropdown-item>
-            <b-dropdown-item href="#">Options</b-dropdown-item>
-            <b-dropdown-item href="#">Exit</b-dropdown-item>
+            <b-dropdown-item href="#">View</b-dropdown-item>
+            <b-dropdown-item href="#">Pending</b-dropdown-item>
+            </b-nav-item-dropdown>
+
+            <b-nav-item-dropdown v-if="this.$store.state.adminLogin" text="Line" right>
+            <b-dropdown-item :to="{name: 'NewMessage'}">New Message</b-dropdown-item>
+            <b-dropdown-item :to="{name: 'ViewMessages'}">View/Edit Messages</b-dropdown-item>
+            </b-nav-item-dropdown>
+
+            <b-nav-item-dropdown v-if="this.$store.state.adminLogin" text="Bot" right>
+            <b-dropdown-item href="#">Permissions</b-dropdown-item>
             </b-nav-item-dropdown>
 
             <b-nav-item-dropdown text="User" right>
-            <b-dropdown-item :to="{name: 'Login'}">Login</b-dropdown-item>
+            <b-dropdown-item v-if="!this.$store.state.adminLogin" :to="{name: 'Login'}">Login</b-dropdown-item>
+            <b-dropdown-item>Settings</b-dropdown-item>
             </b-nav-item-dropdown>
         </b-navbar-nav>
     </b-navbar>

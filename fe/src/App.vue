@@ -2,10 +2,8 @@
 <div>
   <Header />
   <b-container fluid>
-    <b-row class="justify-content-center">
-      <b-col v-if="adminLogin">
-      </b-col>
-      <b-col cols="8">
+    <b-row class="router justify-content-center">
+      <b-col>
         <router-view></router-view>
       </b-col>
     </b-row>
@@ -19,7 +17,7 @@ import Header from "./components/Header.vue"
 export default {
   name: "App",
   components: {
-    Header
+    Header,
   }
   
 }
@@ -27,6 +25,10 @@ export default {
 
 
 <style>
+@font-face {
+  font-family: Geraldine;
+  src: url("./assets/font/GeraldinePersonalUseItalic-PK12m.ttf");
+}
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -38,6 +40,4 @@ export default {
   display: flex;
   justify-content: center;
 }
-
-
 </style>

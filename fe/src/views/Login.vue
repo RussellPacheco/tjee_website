@@ -45,7 +45,6 @@ export default {
     },
     methods: {
         passwordCheck: function() {
-            console.log("I am working")
             this.$store.commit("setAdminLoginToTrue")
             this.$router.push("Admin")
         }
