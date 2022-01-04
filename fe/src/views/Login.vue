@@ -19,7 +19,7 @@
                 <b-row>
                     <b-col></b-col>
                     <b-col></b-col>
-                    <b-col><b-button @click="passwordCheck">Submit</b-button></b-col>
+                    <b-col class="mt-3"><b-button @click="passwordCheck">Submit</b-button></b-col>
                 </b-row>
             </b-col>
             <b-col></b-col>
@@ -46,7 +46,7 @@ export default {
     methods: {
         passwordCheck: function() {
             this.$store.commit("setAdminLoginToTrue")
-            this.$router.push("Admin")
+            this.$router.push("admin")
         }
     }
 }

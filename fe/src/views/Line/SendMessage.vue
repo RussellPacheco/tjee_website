@@ -88,6 +88,12 @@ export default {
         handleSave() {
             if(this.date != "" && this.time != "") {
                 this.$refs['confirm-modal'].show()
+            } else {
+                this.$bvToast.toast('Please select both time and date!', {
+                    title: "Missing Details",
+                    variant: "danger",
+                    solid: true
+                })
             }
         }, 
 
