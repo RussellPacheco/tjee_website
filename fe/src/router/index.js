@@ -9,6 +9,7 @@ import SendMessage from "../views/Line/SendMessage"
 import EditMessage from "../views/Line/EditMessage"
 import Permissions from "../views/Bot/Permissions"
 import NewMember from "../views/Member/NewMember"
+import ViewMembers from "../views/Member/ViewMembers"
 
 Vue.use(VueRouter)
 
@@ -54,11 +55,15 @@ const routes = [
     component: Permissions
   },
   {
-    path: '/member/new',
+    path: '/member/new-member',
     name: 'NewMember',
     component: NewMember
-
   },
+  {
+    path: '/member/view-member',
+    name: 'ViewMembers',
+    component: ViewMembers
+  }
 ]
 
 const router = new VueRouter({

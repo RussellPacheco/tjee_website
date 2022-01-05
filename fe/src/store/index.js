@@ -12,6 +12,18 @@ export default new Vuex.Store({
         permission_value: false
       }
     ],
+    members: [{
+      id: 1,
+      firstname: "Russell",
+      lastname: "Pacheco",
+      gender: "Male",
+      country: "USA",
+      native_lang: "English",
+      lang_focus: "Japanese",
+      meetup_name: "Russell Pacheco",
+      created_at: "Yesterday"
+
+    }],
     messages: [
       {
         id: 1, 

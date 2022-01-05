@@ -82,8 +82,15 @@
                                 label-for="learning-lang"
                                 label-cols-sm="3"
                                 label-align-sm="right"
+                                v-slot="{ ariaLearningLang }"
                             >
-                                <b-form-input id="learning-lang" v-model="newMemberDetails.learningLang.value"></b-form-input>
+                                <b-form-select 
+                                    id="learning-lang" 
+                                    class="pt-2"
+                                    :options="['Japanese','English']"
+                                    :aria-describedby="ariaLearningLang"
+                                    v-model="newMemberDetails.learningLang.value">
+                                    </b-form-select>
                             </b-form-group>
                             <b-form-group
                                 label="Line ID:"
@@ -117,12 +124,12 @@
         <b-modal hide-header-close no-close-on-backdrop @ok="handleConfirm" ref="confirm-modal" ok-title="Confirm" title="Please Confirm Details to Save">
             <b-row>
                 <b-col>
-                    <div class="ml-5" v-for="property in newMemberDetails" :key="property">
+                    <div class="ml-5" v-for="(property, index) in newMemberDetails" :key="index">
                         {{property.name}}:
                     </div>
                 </b-col>
                 <b-col>
-                    <div v-for="property in newMemberDetails" :key="property">
+                    <div v-for="(property, index) in newMemberDetails" :key="index">
                         <b>{{property.value}}</b>
                     </div>
                 </b-col>
@@ -155,14 +162,13 @@ export default {
     },
     methods: {
         handleClear() {
-            this.firstname = ""
-            this.lastname = ""
-            this.gender = ""
-            this.country = ""
-            this.nativeLang = ""
-            this.learningLang = ""
-            this.lineId = ""
-            this.meetupName = ""
+            for (let item in this.newMemberDetails) {
+                if (Object.prototype.hasOwnProperty.call(this.newMemberDetails, item)) {
+                    this.newMemberDetails[`${item}`]["value"] = ""
+                }
+            }
+
+
         },
         handleSave() {
             if (this.formVerification()) {
@@ -177,15 +183,25 @@ export default {
 
         },
 
+        handleConfirm() {
+
+        },
+
         formVerification() {
-            if (this.firstname == "" || this.lastname == "" || this.gender == "" || 
-            this.country == "" || this.nativeLang == "" || this.learningLang == "" ||
-            this.lineId == "" || this.meetupName == "") {
+            let toggle = true
+            for (let item in this.newMemberDetails) {
+                if (this.newMemberDetails[item]["value"] == "") {
+                    toggle = false
+                }
+            }
+
+            if (!toggle) {
                 return false
             } else {
                 return true
             }
-        }
+       }
+        
     }
 }
 </script>
