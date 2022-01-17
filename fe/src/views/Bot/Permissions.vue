@@ -3,7 +3,7 @@
     <b-container class="mt-5 mb-5">
         <b-row>
             <b-col></b-col>
-            <b-col class="title text-center">
+            <b-col class="title text-center" cols="8">
                 View Permissions
             </b-col>
             <b-col></b-col>
@@ -95,7 +95,8 @@ export default {
         },
 
         handleOk() {
-            this.selected
+            this.botPermissions.permission_value = this.selected
+            this.$store.dispatch("updateBotPermissions", this.botPermissions)
         },
 
     }

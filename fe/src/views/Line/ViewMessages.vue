@@ -15,7 +15,7 @@
     <b-container>
         <b-row class="mt-5">
             <b-col></b-col>
-            <b-col cols="10">
+            <b-col cols="12">
                 <b-table striped hover :items="items" :fields="fields" @row-clicked="handleRowClick">
                     <template #cell(id)="data"><a v-b-modal.edit-modal>{{data.value}}</a></template>
                     <template #cell(created_by)="data"><a v-b-modal.edit-modal>{{data.value}}</a></template>
@@ -47,7 +47,7 @@
                     </b-row>
                     <b-row>
                         <b-col></b-col>
-                        <b-col cols="10">{{message.message}}</b-col>
+                        <b-col class="text-center" cols="10">{{message.message}}</b-col>
                         <b-col></b-col>
                     </b-row>
                 </b-col>
@@ -77,15 +77,18 @@ export default {
         return {
             message: {
                 id: "",
-                created_by: "",
+                num_id: "",
+                title: "",
+                created_by_name: "",
                 message: "",
                 created_at: "",
                 last_sent: ""
             },
 
             fields:[
-                {key:"id", label:"ID"}, 
-                {key: "created_by"}, 
+                {key:"num_id", label:"ID"}, 
+                {key:"title"},
+                {key: "created_by_name", label: "Creator"}, 
                 {key: "message", formatter: (value) => {return value.slice(0, 50).concat(" . . .")}}, 
                 {key: "created_at"}, 
                 {key: "last_sent"}
@@ -94,8 +97,9 @@ export default {
             items: this.$store.state.messages,
 
             modalFields: [
-                {key:"id", label:"ID"}, 
-                {key: "created_by"}, 
+                {key:"num_id", label:"ID"}, 
+                {key:"title"},
+                {key: "created_by_name", label: "Creator"}, 
                 {key: "created_at"}, 
                 {key: "last_sent"}
             ],

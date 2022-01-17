@@ -14,6 +14,7 @@ def controller_create_member(db, member_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -23,6 +24,7 @@ def controller_get_member(member_obj, member_id):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -32,6 +34,7 @@ def controller_get_all_members(member_obj):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -48,8 +51,16 @@ def controller_admin_login(admin_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
+def controller_admin_get_all(admin_obj):
+    try:
+        data = service_admin_get_all(admin_obj)
+        return data
+    except Exception as e:
+        print(e)
+        return str(e)
 
 def controller_admin_create(db, admin_obj, json_data):
     try:
@@ -57,6 +68,7 @@ def controller_admin_create(db, admin_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -66,6 +78,7 @@ def controller_admin_delete(db, admin_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -75,6 +88,7 @@ def controller_admin_change_password(db, admin_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -91,6 +105,7 @@ def controller_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, 
         # data = service_line_webhook(db, webhook_obj, json_data)
         return data
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -99,6 +114,7 @@ def controller_line_change_bot_permission(db, bot_permission_obj, json_data):
         data = service_line_change_bot_permission(db, bot_permission_obj, json_data)
         return data
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -107,6 +123,7 @@ def controller_line_get_bot_permissions(bot_permission_obj):
         data = service_line_get_bot_permissions(bot_permission_obj)
         return data
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -116,6 +133,7 @@ def controller_line_create_message(db, line_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -125,16 +143,17 @@ def controller_line_send_message(db, line_obj, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
 def controller_line_get_all_messages(line_obj):
     try:
         data = service_line_get_all_messages(line_obj)
-
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -144,6 +163,7 @@ def controller_line_get_message(line_obj, message_id):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -153,6 +173,7 @@ def controller_line_update_message(db, line_obj, message_id, json_data):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -162,6 +183,7 @@ def controller_line_delete_message(db, line_obj, message_id):
         return data
 
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -177,4 +199,23 @@ def controller_get_new_member_application(db, new_members_obj):
         return data
 
     except Exception as e:
+        print(e)
+        return str(e)
+
+
+def controller_get_current_members(member_obj):
+    try:
+        data = service_get_current_members(member_obj)
+        return data
+    except Exception as e:
+        print(e)
+        return str(e)
+
+
+def controller_get_current_events():
+    try:
+        data = service_get_current_events()
+        return data
+    except Exception as e:
+        print(e)
         return str(e)

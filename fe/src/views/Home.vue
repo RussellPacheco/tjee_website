@@ -6,6 +6,11 @@
         <b-col class="text-center mt-5" id="logo">Welcome to TJEE!</b-col>
         <b-col></b-col>       
       </b-row>
+      <b-row>
+        <b-col></b-col>
+        <b-col class="d-flex justify-content-center"><img src="../assets/img/construction.jpg" id="construction"/></b-col>
+        <b-col></b-col>
+      </b-row>
     </b-container>
   </div>
 </template>
@@ -24,6 +29,10 @@ export default {
 
 #logo {
   font-size: 50px;
+}
+
+#construction {
+  height: 20%;
 }
 
 </style>

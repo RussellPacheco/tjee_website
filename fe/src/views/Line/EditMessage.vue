@@ -19,9 +19,21 @@
                     </b-col>
                 </b-row>
                 <b-row>
-                    <b-col class="text-center mt-4"><b id="message-title">Message</b></b-col>
+                    <b-col class="text-center">
+                        <b class="message-title">Title</b>
+                    </b-col>
                 </b-row>
-                <b-row class="mt-3">
+                <b-row>
+                    <b-col class="text-center mt-3">
+                        {{this.$store.state.editMessage.title}}
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col class="text-center mt-4">
+                        <b class="message-title">Message</b>
+                    </b-col>
+                </b-row>
+                <b-row class="text-center mt-3">
                     <b-col>{{this.$store.state.editMessage.message}}</b-col>
                 </b-row>
             </b-col>
@@ -63,10 +75,11 @@ export default {
     name: "EditMessage",
     data() {
         return {
+            editingMessage: this.$store.state.editMessage,
             text: this.$store.state.editMessage.message,
             modalFields: [
-                {key:"id", label:"ID"}, 
-                {key: "created_by"}, 
+                {key:"num_id", label:"ID"}, 
+                {key: "created_by_name", label: "Creator"}, 
                 {key: "created_at"}, 
                 {key: "last_sent"}
             ],
@@ -74,8 +87,10 @@ export default {
     },
 
     methods: {
-        handleOk(bvModalEvt) {
-            bvModalEvt.preventDefault()
+        handleOk() {
+            this.editingMessage.message = this.text
+            this.$store.dispatch("saveEditedMessage", this.editingMessage)
+
 
         },
 
@@ -95,7 +110,7 @@ export default {
     border-radius: 3px;
 }
 
-#message-title {
+.message-title {
     text-decoration: underline;
 }
 

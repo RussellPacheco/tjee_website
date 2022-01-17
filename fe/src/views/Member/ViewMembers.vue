@@ -15,9 +15,8 @@
     <b-container>
         <b-row class="mt-5">
             <b-col></b-col>
-            <b-col cols="10">
+            <b-col cols="12">
                 <b-table striped hover :items="items" :fields="fields" @row-clicked="handleRowClick">
-                    <template #cell(id)="data"><a v-b-modal.edit-modal>{{data.value}}</a></template>
                     <template #cell(firstname)="data"><a v-b-modal.edit-modal>{{data.value}}</a></template>
                     <template #cell(lastname)="data">{{data.value}}</template>
                     <template #cell(gender)="data">{{data.value}}</template>
@@ -32,7 +31,7 @@
             <b-col></b-col>
         </b-row>
     </b-container>                
-    <b-modal ref="edit-modal" hide-header-close no-close-on-backdrop title="Your Selected Member" size="lg" ok-title="Edit Member">
+    <b-modal ref="edit-modal" hide-header-close no-close-on-backdrop title="Your Selected Member" size="lg" ok-title="Edit Member" @ok="handleEdit">
         <b-container>
             <b-row>
                 <b-col>
@@ -64,7 +63,6 @@ export default {
             },
 
             fields:[
-                {key:"id", label:"ID"}, 
                 {key:"firstname", label: "First Name"},
                 {key:"lastname", label: "Last Name"},
                 {key:"gender"},
@@ -78,7 +76,6 @@ export default {
             items: this.$store.state.members,
 
             modalFields: [
-                {key:"id", label:"ID"}, 
                 {key:"firstname", label: "First Name"},
                 {key:"lastname", label: "Last Name"},
                 {key:"gender"},
@@ -103,7 +100,7 @@ export default {
         },
 
         handleEdit() {
-            this.$store.commit("setEditMember", this.message)
+            this.$store.commit("setEditMember", this.member)
             this.$router.push({name: 'EditMember'})
         }
 

@@ -8,10 +8,10 @@ class Member(db.Model):
     id = db.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     firstname = db.Column("firstname", db.String(35), nullable=False)
     lastname = db.Column("lastname", db.String(35), nullable=False)
-    gender = db.Column("gender", db.String(1), nullable=False)
+    gender = db.Column("gender", db.String(7), nullable=False)
     country = db.Column("country", db.String(54), nullable=False)
     native_lang = db.Column("native_lang", db.String(20), nullable=False)
-    lang_focus = db.Column("lang_focus", db.String(3), nullable=False)
+    lang_focus = db.Column("lang_focus", db.String(8), nullable=False)
     line_id = db.Column("line_id", db.String(15), nullable=True, unique=True)
     line_api_id = db.Column("line_api_id", db.String(40), nullable=True, unique=True)
     meetup_id = db.Column("meetup_id", db.String(10), nullable=True, unique=True)
@@ -43,6 +43,8 @@ class Admin(db.Model):
 class LineMessage(db.Model):
     __tablename__ = "line_messages"
     id = db.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    num_id = db.Column("num_id", db.Integer, db.Identity(start=1, cycle=True), nullable=False)
+    title = db.Column("title", db.String(45), nullable=False)
     created_by = db.Column("created_by", UUID(as_uuid=True), db.ForeignKey("members.id", ondelete="SET NULL"), nullable=False)
     message = db.Column("message", db.String(700), nullable=False)
     created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)

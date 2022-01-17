@@ -23,6 +23,11 @@ def dao_get_member_by_id(member_obj, member_id):
     return result
 
 
+def dao_get_member_by_meetup_id(member_obj, meetup_id):
+    result = member_obj.query.filter_by(meetup_id=meetup_id).first()
+    return result
+
+
 def dao_get_all_members(member_obj):
     results = member_obj.query.all()
     return results
@@ -37,6 +42,11 @@ def dao_get_all_members(member_obj):
 def dao_get_admin_by_username(admin_obj, username):
     result = admin_obj.query.filter_by(username=username).first()
     return result
+
+
+def dao_admin_get_all(admin_obj):
+    results = admin_obj.query.all()
+    return results
 
 
 def dao_create_admin(db, admin_obj, member_id, username, password):
@@ -64,9 +74,7 @@ def dao_admin_change_password(db, admin_obj, username, password):
 #########
 
 def dao_line_save_webhook(db, webhook_obj, line_type, timestamp, userId=None, groupId=None, message=None):
-    print("in dao_line_save_webhook")
     if line_type in ["leave", "memberJoined", "memberLeft"]:
-        print("in if statement for dao")
         new_webhook = webhook_obj(type=line_type, timestamp=timestamp, groupId=groupId, userId=userId)
         db.session.add(new_webhook)
         db.session.commit()
@@ -110,8 +118,8 @@ def dao_line_change_bot_permission(db, bot_permission_obj, permission_name, perm
     db.session.commit()
 
 
-def dao_line_create_message(db, line_obj, created_by, message):
-    new_message = line_obj(created_by=created_by, message=message)
+def dao_line_create_message(db, line_obj, created_by, title, body):
+    new_message = line_obj(created_by=created_by, title=title, message=body)
     db.session.add(new_message)
     db.session.commit()
 

@@ -9,16 +9,49 @@
             <b-col></b-col>
         </b-row>
         <b-row>
-            <b-col></b-col>
-            <b-col cols="10">
+            <b-col>
+                <b-row>
+                    <b-col class="d-flex justify-content-center" id="imgBox">
+                        <b-img rounded="circle" id="userImage" :src="selectedMember.photo.photo_link" />
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col class="mt-4">
+                        <b-card bg-variant="light">
+                            <b-form-group
+                                label="① Check"
+                                label-size="lg"
+                                label-class="font-weight-bold pt-0"
+                                class="mb-0"
+                            >
+                                <b-form-group
+                                    label="Is the new member in this list?"
+                                    label-for="member-select"
+                                    v-slot="{ memberSelect }"
+                                >
+                                    <b-form-select
+                                        id="member-select"
+                                        class=""
+                                        :options="memberList"
+                                        :aria-describedby="memberSelect"
+                                        v-model="selectedMember"
+                                        @change="updateForm"
+                                    ></b-form-select>
+                                </b-form-group>
+                            </b-form-group>
+                        </b-card>
+                    </b-col>
+                </b-row>
+            </b-col>
+            <b-col cols="8">
                 <b-card bg-variant="light">
-                                        <b-form-group
+                    <b-form-group
                         label-cols-lg="3"
-                        label="Please fill out all sections."
+                        label="➁ Fill out"
                         label-size="lg"
                         label-class="font-weight-bold pt-0"
                         class="mb-0"
-                         >
+                    >
                             <b-form-group                                
                                 label-align="left"
                                 label="First Name:"
@@ -119,7 +152,6 @@
                     </b-form-group>
                 </b-card>
             </b-col>
-            <b-col></b-col>
         </b-row>
         <b-modal hide-header-close no-close-on-backdrop @ok="handleConfirm" ref="confirm-modal" ok-title="Confirm" title="Please Confirm Details to Save">
             <b-row>
@@ -141,11 +173,16 @@
 
 <script>
 import langList from "../../assets/data/lang.js"
+import { EventBus } from "../../utils"
 
 export default {
     name: "NewMember",
     data() {
         return {
+            status: 0,
+            selectedMember: {photo: {photo_link: ""}},
+            memberList: this.$store.state.unregisteredMembers.map(obj => { return {value: obj, text: obj.name} }),
+            userImage: "https://secure.meetupstatic.com/photos/member/9/a/8/1/member_253599553.jpeg",
             newMemberDetails: {
                 firstname: {name: "First Name", value: ""},
                 lastname: {name: "Last Name", value: ""},
@@ -154,6 +191,7 @@ export default {
                 nativeLang: {name: "Native Language", value: ""},
                 learningLang: {name: "Learning Language", value: ""},
                 lineId: {name: "Line ID", value: ""},
+                meetupId: {name: "Meetup ID", value: ""},
                 meetupName: {name: "Meetup Name", value: ""},
             },
 
@@ -167,8 +205,6 @@ export default {
                     this.newMemberDetails[`${item}`]["value"] = ""
                 }
             }
-
-
         },
         handleSave() {
             if (this.formVerification()) {
@@ -180,18 +216,45 @@ export default {
                     solid: true
                 })
             }
-
         },
 
-        handleConfirm() {
+        async handleConfirm() {
+            const newMemberObj = {
+                firstname: this.newMemberDetails.firstname.value,
+                lastname: this.newMemberDetails.lastname.value,
+                gender: this.newMemberDetails.gender.value,
+                country: this.newMemberDetails.country.value,
+                native_lang: this.newMemberDetails.nativeLang.value,
+                lang_focus: this.newMemberDetails.learningLang.value,
+                line_id: this.newMemberDetails.lineId.value,
+                meetup_name: this.newMemberDetails.meetupName.value,
+                meetup_id: this.newMemberDetails.meetupId.value
+            }
 
+            await this.$store.dispatch("saveNewMember", newMemberObj)
+
+            if (this.status != 0) {
+                this.$bvToast.toast('Member already exists', {
+                    title: "Error!",
+                    variant: "danger",
+                    solid: true
+                })
+            } else {
+                this.$bvToast.toast('Success!', {
+                    title: "Member successfully created",
+                    variant: "success",
+                    solid: true
+                })
+            }
         },
 
         formVerification() {
             let toggle = true
             for (let item in this.newMemberDetails) {
-                if (this.newMemberDetails[item]["value"] == "") {
+                if (item != "meetupId") {
+                    if (this.newMemberDetails[item]["value"] == "") {
                     toggle = false
+                    }
                 }
             }
 
@@ -200,9 +263,54 @@ export default {
             } else {
                 return true
             }
-       }
-        
-    }
+        },
+        updateForm() {
+            if (this.selectedMember != "MEMBER DOESN'T EXIST") {
+                for (let member of this.$store.state.unregisteredMembers) {
+                    if (member["name"] == this.selectedMember["name"]) {
+                        const fullname = member["name"].split(" ")
+                        this.newMemberDetails = {
+                            firstname: {name: "First name", value: fullname[0]},
+                            lastname: {name: "Last name", value: fullname.length == 2 ? fullname[1] : ""},
+                            gender: {name: "Gender", value: ""},
+                            country:{name: "Country", value: member.country},
+                            nativeLang: {name: "Native Language", value: ""},
+                            learningLang: {name: "Learning Language", value: ""},
+                            lineId: {name: "Line ID", value: ""},
+                            meetupId: {name: "Meetup ID", value: member.id},
+                            meetupName: {name: "Meetup Name", value: member.name},
+                        }
+                    }
+                }                
+            } else {
+                this.newMemberDetails = {
+                    firstname: {name: "First Name", value: ""},
+                    lastname: {name: "Last Name", value: ""},
+                    gender: {name: "Gender", value: ""},
+                    country:{name: "Country", value: ""},
+                    nativeLang: {name: "Native Language", value: ""},
+                    learningLang: {name: "Learning Language", value: ""},
+                    lineId: {name: "Line ID", value: ""},
+                    meetupId: {name: "Meetup ID", value: ""},
+                    meetupName: {name: "Meetup Name", value: ""},
+                }
+            }
+        },        
+    },
+
+    mounted() {
+        EventBus.$on('failedMemberCreation', () => {
+            this.status = 1
+            this.$bvToast.toast("New member was not saved.", {
+                title: "Error!",
+                variant: "danger",
+                solid: true
+            })
+        })
+    },
+    beforeDestroy () {
+        EventBus.$off('failedMemberCreation')
+  }
 }
 </script>
 

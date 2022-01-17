@@ -3,10 +3,12 @@ import hmac
 import binascii
 import hashlib
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from dao import *
 from .utils import send_message
-
+import requests
+import jwt
+from flask import current_app, jsonify
 
 #########
 #
@@ -14,12 +16,30 @@ from .utils import send_message
 #
 #########
 
+
 def service_create_member(db, member_obj, json_data):
     member_exist = dao_get_member_by_fullname(member_obj, json_data["firstname"], json_data["lastname"])
 
     status = {"status": 1}
 
     if member_exist is None:
+
+        line_id = None
+        line_api_id = None
+        meetup_id = None
+        meetup_name = None
+
+        if "line_id" in json_data:
+            line_id = json_data["line_id"]
+
+        if "line_api_id" in json_data:
+            line_api_id = json_data["line_api_id"]
+
+        if "meetup_id" in json_data:
+            meetup_id = json_data["meetup_id"]
+
+        if "meetup_name" in json_data:
+            meetup_name = json_data["meetup_name"]
 
         dao_create_member(
             db,
@@ -30,12 +50,11 @@ def service_create_member(db, member_obj, json_data):
             country=json_data["country"],
             native_lang=json_data["native_lang"],
             lang_focus=json_data["lang_focus"],
-            line_id=json_data["line_id"],
-            line_api_id=json_data["line_api_id"],
-            meetup_id=json_data["meetup_id"],
-            meetup_name=json_data["meetup_name"],
+            line_id=line_id,
+            line_api_id=line_api_id,
+            meetup_id=meetup_id,
+            meetup_name=meetup_name
         )
-
         status["status"] = 0
 
         return status
@@ -68,19 +87,19 @@ def service_get_member(member_obj, member_id):
         "created_at": data.created_at,
         "last_modified": data.last_modified
     }
-    
+
     return json_data
 
 
 def service_get_all_members(member_obj):
     data = dao_get_all_members(member_obj)
-    
+
     members = []
     status = {"status": 1}
 
     if len(data) == 0:
         return status
-    
+
     for member in data:
         json_object = {
             "id": member.id,
@@ -121,17 +140,47 @@ def service_admin_login(admin_obj, json_data):
     stored_password = admin_exists.password[64:]
     pwdhash = hashlib.pbkdf2_hmac("sha512", json_data["password"].encode("utf-8"), salt.encode("ascii"), 100000)
     pwdhash = binascii.hexlify(pwdhash).decode("ascii")
-
     if pwdhash == stored_password:
+        token = jwt.encode({
+            "sub": admin_exists.username,
+            "iat": datetime.utcnow(),
+            "exp": datetime.utcnow() + timedelta(minutes=30)
+        }, current_app.config['SECRET_KEY'])
         json_data = {
             "status": 0,
-            "user_id": admin_exists.id,
-            "username": admin_exists.username
+            "member_id": admin_exists.member_id,
+            "firstname": admin_exists.member.firstname,
+            "admin_id": admin_exists.id,
+            "username": admin_exists.username,
+            "token": token
         }
-        return json_data
+
+        return jsonify(json_data)
     else:
         status["status"] = -1
         return status
+
+
+def service_admin_get_all(admin_obj):
+    results = dao_admin_get_all(admin_obj)
+    status = {"status": 1}
+    admins = []
+
+    if results is None:
+        return status
+
+    for admin in results:
+        json_object = {
+            "id": admin.id,
+            "member_id": admin.member_id,
+            "username": admin.username,
+            "firstname": admin.member.firstname
+        }
+
+        admins.append(json_object)
+    status["status"] = 0
+    status["admins"] = admins
+    return status
 
 
 def service_admin_create(db, admin_obj, json_data):
@@ -226,8 +275,7 @@ def service_admin_change_password(db, admin_obj, json_data):
 #########
 
 def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
-
-# def service_line_webhook(db, webhook_obj, json_data):
+    # def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'
     #
@@ -320,15 +368,16 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
                 if EVENT_TYPE == "message":
                     exists = dao_line_get_webhook(webhook_obj, line_type=EVENT_TYPE, userId=USER_ID)
                     if exists is None:
-                        dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID, message=event["message"]["text"])
+                        dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP,
+                                              userId=USER_ID, message=event["message"]["text"])
                 else:
                     dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, userId=USER_ID)
             elif EVENT_TYPE in ["join", "leave", "memberJoined", "memberLeft"]:
-                dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, groupId=GROUP_ID, userId=USER_ID)
+                dao_line_save_webhook(db, webhook_obj, line_type=EVENT_TYPE, timestamp=TIMESTAMP, groupId=GROUP_ID,
+                                      userId=USER_ID)
                 if EVENT_TYPE == "join":
                     allowed = dao_line_get_bot_permission(bot_permission_obj, permission_name="group_join")
                     if allowed.permission:
-
                         text = """
                         
                         Thank you for inviting me! 
@@ -353,7 +402,6 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
 
 
 def service_line_change_bot_permission(db, bot_permission_obj, json_data):
-
     status = {"status": 1}
     permission_name = json_data["permission_name"]
     permission_value = json_data["permission_value"]
@@ -362,9 +410,10 @@ def service_line_change_bot_permission(db, bot_permission_obj, json_data):
     exists = dao_line_get_bot_permission(bot_permission_obj, permission_name=permission_name)
 
     if exists:
-        dao_line_change_bot_permission(db, bot_permission_obj, permission_name=permission_name, permission_value=permission_value, last_modified=last_modified)
-        status["status"] = 0
-        return status
+        dao_line_change_bot_permission(db, bot_permission_obj, permission_name=permission_name,
+                                       permission_value=permission_value, last_modified=last_modified)
+
+        return service_line_get_bot_permissions(bot_permission_obj)
     else:
         return status
 
@@ -383,7 +432,7 @@ def service_line_get_bot_permissions(bot_permission_obj):
         json_obj = {
             "id": permission.id,
             "permission_name": permission.permission_name,
-            "message": permission.permission_value,
+            "permission_value": permission.permission_value,
             "last_modified": permission.last_modified
         }
 
@@ -393,7 +442,8 @@ def service_line_get_bot_permissions(bot_permission_obj):
 
 
 def service_line_create_message(db, line_obj, json_data):
-    dao_line_create_message(db, line_obj, json_data["created_by"], json_data["message"])
+
+    dao_line_create_message(db, line_obj, json_data["created_by"], json_data["message"]["title"], json_data["message"]["body"])
 
     messages = service_line_get_all_messages(line_obj)
 
@@ -401,7 +451,6 @@ def service_line_create_message(db, line_obj, json_data):
 
 
 def service_line_send_message(db, line_obj, json_data):
-
     status = {"status": 1}
     MESSAGE = json_data["message"]
     DESTINATION = json_data["destination"]
@@ -428,9 +477,13 @@ def service_line_get_all_messages(line_obj):
         return status
 
     for message in data:
+
         json_obj = {
             "id": message.id,
+            "num_id": message.num_id,
+            "title": message.title,
             "created_by": message.created_by,
+            "created_by_name": message.member.firstname,
             "message": message.message,
             "created_at": message.created_at,
             "last_sent": message.last_sent,
@@ -453,7 +506,10 @@ def service_line_get_message(line_obj, message_id):
     json_obj = {
         "status": 0,
         "id": message.id,
+        "num_id": message.num_id,
+        "title": message.title,
         "created_by": message.created_by,
+        "created_by_name": message.message.firstname,
         "message": message.message,
         "created_at": message.created_at,
         "last_sent": message.last_sent,
@@ -473,7 +529,7 @@ def service_line_update_message(db, line_obj, message_id, json_data):
 
     dao_line_update_message(db, line_obj, message_id, json_data["message"], datetime.now())
 
-    return service_line_get_message(line_obj, message_id)
+    return service_line_get_all_messages(line_obj)
 
 
 def service_line_delete_message(db, line_obj, message_id):
@@ -502,3 +558,21 @@ def service_get_new_member_application(db, new_members_obj):
     # get the meetup id from both and see which one is new, then saved to db the new one
 
     pass
+
+
+def service_get_current_members(member_obj):
+    meetup_apicall = requests.get("https://api.meetup.com/TJEE-Tokyo-Japanese-English-exchange/members?")
+    content = meetup_apicall.json()
+    not_saved_members = []
+    for member in content:
+        exists = dao_get_member_by_meetup_id(member_obj, str(member['id']))
+        if exists is None:
+            not_saved_members.append(member)
+    return {"unregisteredMembers": not_saved_members}
+
+
+def service_get_current_events():
+    meetup_apicall = requests.get("https://api.meetup.com/TJEE-Tokyo-Japanese-English-exchange/events?")
+    content = meetup_apicall.json()
+
+    return content
