@@ -11,7 +11,7 @@ Status code explanations
 
 |Method|Endpoint|Status -1|Status 0|Status 1|Other|
 |:---:|:---|:---:|:---:|:---:|:---:|
-|POST|/api/members/create/|*|Creation Success|Member Exists|*|
+|POST|/api/members/create/|Creation Error|Creation Success|Member Exists|*|
 |GET|/api/members/<member_id>/|*|Query Success|Member Doesn't Exist|*|
 |GET|/api/members/|*|Query Success|No Members Exist|*|
 |POST|/api/admins/login/|Bad Password|Login Success|Admin Doesn't Exist|*|

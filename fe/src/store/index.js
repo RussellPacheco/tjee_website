@@ -171,8 +171,8 @@ export default new Vuex.Store({
       try {
         const auth = { headers: { Authorization: this.state.jwt } }
         const res = await axios.post("/api/members/create/", payload, auth)
-          if (res.data.status == 1) {
-            throw 1
+          if (res.data.status != 0) {
+            throw res.data.status
           }
         dispatch("getMembers")
 
@@ -181,13 +181,14 @@ export default new Vuex.Store({
       
       } catch (err) {
         console.error(err)
-        EventBus.$emit("failedMemberCreation", 1)
+        EventBus.$emit("failedMemberCreation", err)
       }
     },
 
     async getMembers({ commit }) {
       try {
-        const res = await axios.get("/api/members/")
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.get("/api/members/", auth)
         if (res.data.status == 0) {
           commit("setMembers", res.data.members)          
         }

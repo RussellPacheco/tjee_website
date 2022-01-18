@@ -192,9 +192,7 @@ class Meetup:
 
 
 soup = Meetup()
-soup.login(email="languageexchange.tjee@gmail.com", password="Y8Z43cmYj3")
-items = soup.get_member_objects()
+soup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
 soup.quit()
 
 
-print(items)

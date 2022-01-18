@@ -130,6 +130,7 @@
                                 label-for="line-id"
                                 label-cols-sm="3"
                                 label-align-sm="right"
+                                v-b-popover.hover.top="'Must be unique'"
                             >
                                 <b-form-input id="line-id" v-model="newMemberDetails.lineId.value"></b-form-input>
                             </b-form-group>
@@ -138,6 +139,8 @@
                                 label-for="meetup-name"
                                 label-cols-sm="3"
                                 label-align-sm="right"
+                                v-b-popover.hover.top="'Must be unique'"
+
                             >
                                 <b-form-input id="meetup-name" v-model="newMemberDetails.meetupName.value"></b-form-input>
                             </b-form-group>
@@ -233,8 +236,14 @@ export default {
 
             await this.$store.dispatch("saveNewMember", newMemberObj)
 
-            if (this.status != 0) {
+            if (this.status == 1) {
                 this.$bvToast.toast('Member already exists', {
+                    title: "Error!",
+                    variant: "danger",
+                    solid: true
+                })
+            } else if (this.status == -1) {
+                this.$bvToast.toast('There was an error saving.', {
                     title: "Error!",
                     variant: "danger",
                     solid: true
@@ -245,6 +254,19 @@ export default {
                     variant: "success",
                     solid: true
                 })
+                this.selectedMember = {photo: {photo_link: ""}},
+                this.memberList = this.$store.state.unregisteredMembers.map(obj => { return {value: obj, text: obj.name} }),
+                this.newMemberDetails = {
+                    firstname: {name: "First Name", value: ""},
+                    lastname: {name: "Last Name", value: ""},
+                    gender: {name: "Gender", value: ""},
+                    country:{name: "Country", value: ""},
+                    nativeLang: {name: "Native Language", value: ""},
+                    learningLang: {name: "Learning Language", value: ""},
+                    lineId: {name: "Line ID", value: ""},
+                    meetupId: {name: "Meetup ID", value: ""},
+                    meetupName: {name: "Meetup Name", value: ""},
+                }
             }
         },
 
@@ -299,8 +321,8 @@ export default {
     },
 
     mounted() {
-        EventBus.$on('failedMemberCreation', () => {
-            this.status = 1
+        EventBus.$on('failedMemberCreation', (err) => {
+            this.status = err
             this.$bvToast.toast("New member was not saved.", {
                 title: "Error!",
                 variant: "danger",

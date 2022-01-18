@@ -15,7 +15,7 @@ def controller_create_member(db, member_obj, json_data):
 
     except Exception as e:
         print(e)
-        return str(e)
+        return {"status": -1}
 
 
 def controller_get_member(member_obj, member_id):
@@ -53,6 +53,7 @@ def controller_admin_login(admin_obj, json_data):
     except Exception as e:
         print(e)
         return str(e)
+
 
 def controller_admin_get_all(admin_obj):
     try:

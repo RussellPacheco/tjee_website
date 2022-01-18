@@ -41,7 +41,9 @@ def service_create_member(db, member_obj, json_data):
         if "meetup_name" in json_data:
             meetup_name = json_data["meetup_name"]
 
-        dao_create_member(
+        print("about to create member")
+
+        result = dao_create_member(
             db,
             member_obj,
             firstname=json_data["firstname"],
@@ -56,6 +58,8 @@ def service_create_member(db, member_obj, json_data):
             meetup_name=meetup_name
         )
         status["status"] = 0
+        print(result)
+        print("member created")
 
         return status
 
