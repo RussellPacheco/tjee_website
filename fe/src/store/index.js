@@ -16,6 +16,23 @@ export default new Vuex.Store({
       username: "Default_username",
       firstname: "Default_firstname"
     }],
+    pendingMember: {
+      id:0,
+      name:"Default Name",
+      app_date:"Default app. date",
+      link: "Default link",
+      answers: {
+        answer_one: "one",
+        answer_two: "two",
+        answer_three: "three"
+      }
+    },
+    pendingMembers: [{
+      id:0,
+      name:"Default Name",
+      app_date:"Default app. date",
+      link: "Default link",
+    }],
     unregistedMembers: [{
       id: 0,
       name: "Default",
@@ -124,6 +141,9 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    setPendingMembers(state, payload) {
+      state.pendingMembers = payload
+    },
     setAdminLoginToTrue(state) {
       state.adminLogin = true
     },
@@ -192,6 +212,19 @@ export default new Vuex.Store({
         if (res.data.status == 0) {
           commit("setMembers", res.data.members)          
         }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    async getPendingMembers({ commit }) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.get("/api/members/pending", auth)
+        if (res.data.status == 0) {
+          commit("setPendingMembers", res.data.pending_members)
+        }
+
       } catch (err) {
         console.error(err)
       }

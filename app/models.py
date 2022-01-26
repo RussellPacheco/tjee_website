@@ -60,9 +60,14 @@ class LineMessage(db.Model):
 class NewMembers(db.Model):
     __tablename__ = "new_members"
     id = db.Column("id", db.Integer, primary_key=True, nullable=False)
-    meetup_id = db.Column("meetup_id", db.String(10), nullable=True, unique=True)
-    meetup_name = db.Column("meetup_name", db.String(25), nullable=True)
+    meetup_id = db.Column("meetup_id", db.String(10), nullable=False, unique=True)
+    meetup_name = db.Column("meetup_name", db.String(25), nullable=False)
     created_at = db.Column("created_at", db.DateTime, default=db.func.now(), nullable=False)
+    app_date = db.Column("app_date", db.DateTime, nullable=False)
+    link = db.Column("link", db.String(150), nullable=False)
+    answer_one = db.Column("answer_one", db.String(250), nullable=True)
+    answer_two = db.Column("answer_two", db.String(250), nullable=True)
+    answer_three = db.Column("answer_three", db.String(250), nullable=True)
 
     def __repr__(self):
         return '<NewMember %r>' % self.meetup_name

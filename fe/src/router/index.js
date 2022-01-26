@@ -11,6 +11,7 @@ import Permissions from "../views/Bot/Permissions"
 import NewMember from "../views/Member/NewMember"
 import ViewMembers from "../views/Member/ViewMembers"
 import EditMember from "../views/Member/EditMember"
+import ViewPendingMembers from "../views/Member/ViewPendingMembers"
 import Settings from "../views/User/Settings"
 import NotFound from "../views/NotFound"
 import store from "../store"
@@ -137,9 +138,21 @@ const routes = [
     }
   },
   {
-    path:'/line/edit-member',
+    path:'/member/edit-member',
     name: 'EditMember',
     component: EditMember,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.isAuthenticated) {
+        next('/login')
+      } else {
+        next()
+      }
+    }
+  },
+  {
+    path:'/member/pending-members',
+    name: 'ViewPendingMembers',
+    component: ViewPendingMembers,
     beforeEnter: (to, from, next) => {
       if (!store.getters.isAuthenticated) {
         next('/login')

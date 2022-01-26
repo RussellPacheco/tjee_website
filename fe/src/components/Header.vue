@@ -11,7 +11,7 @@
             <b-nav-item-dropdown v-if="isAuthenticated" text="Members" left>
                 <b-dropdown-item :to="{name: 'NewMember'}">Add New Member</b-dropdown-item>
                 <b-dropdown-item :to="{name: 'ViewMembers'}">View/Edit Members</b-dropdown-item>
-                <b-dropdown-item href="#">View Pending Applications</b-dropdown-item>
+                <b-dropdown-item :to="{name: 'ViewPendingMembers'}">View Pending Applications</b-dropdown-item>
             </b-nav-item-dropdown>
 
             <b-nav-item-dropdown v-if="isAuthenticated" text="Line" left>

@@ -30,7 +30,7 @@
                                 <b-list-group-item :to="{name: 'ViewMembers'}">
                                     <b>Edit/View Member</b> - View all members and edit a specific member's details.
                                 </b-list-group-item>
-                                <b-list-group-item :to="{name: 'Home'}">
+                                <b-list-group-item :to="{name: 'ViewPendingMembers'}">
                                     <b>View Pending Applications</b> - View all pending applications from Meetup. 
                                 </b-list-group-item>                      
                             </b-list-group>

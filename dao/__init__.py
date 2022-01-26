@@ -156,6 +156,6 @@ def dao_line_delete_message(db, line_obj, message_id):
 #
 #########
 
-def dao_get_all_new_members(new_members_obj):
+def dao_get_new_member_application(new_members_obj):
     results = new_members_obj.query.all()
     return results

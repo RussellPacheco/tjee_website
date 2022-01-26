@@ -1,3 +1,4 @@
+import dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -5,12 +6,12 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import re
 import os
 import time
 
+dotenv.load_dotenv()
 
 class Meetup:
     def __init__(self):
@@ -53,6 +54,10 @@ class Meetup:
 
             last_height = new_height
 
+    def _scroll_up(self):
+        """"A method for scrolling the page."""
+        self.driver.execute_script("window.scrollTo(0, 0);")
+
     def login(self, email: str, password: str) -> BeautifulSoup:
         self.driver.get("https://www.meetup.com/login")
 
@@ -66,15 +71,94 @@ class Meetup:
         WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located(
             (By.XPATH, "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
 
+    def get_pending_members(self) -> list:
+        self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
+        self._scroll_down()
+        soup = BeautifulSoup(self.driver.page_source, features="html.parser")
+        pending_member_list = soup.find("ul", class_="groupMembersList")
+        individual_list = pending_member_list.find_all("li")
+
+        pending_members = []
+
+        for li in individual_list:
+            link = f"https://www.meetup.com{li.find('a').get('href')}"
+            pending_members_name = li.find("h4").text
+            pending_members_date = li.find("div", class_="member-item-subtitle").text
+            date_array = re.findall("\d{1,5}", pending_members_date)
+
+            pending_member = {
+                "meetup_id": re.search("\d{2,}", link)[0],
+                "meetup_name": pending_members_name,
+                "app_date": f"{date_array[0]}/{date_array[1]}/{date_array[2]}",
+                "link": link
+            }
+
+            pending_members.append(pending_member)
+
+        return pending_members
+
+    def get_pending_member_detail(self, member_obj):
+        self.driver.get(member_obj["link"])
+        soup = BeautifulSoup(self.driver.page_source, features="html.parser")
+        member_info_card = soup.find_all("div", class_="_memberInfoCard-module_card__7_JXK")
+
+        answers = {"answer_one": None, "answer_two": None, "answer_three": None}
+        counter = 0
+        for detail in member_info_card:
+            qa = detail.find_all("p")
+
+            if counter == 0:
+                answers["answer_one"] = qa[1].text
+            elif counter == 1:
+                answers["answer_two"] = qa[1].text
+            else:
+                answers["answer_three"] = qa[1].text
+
+            counter += 1
+
+        member_obj["answers"] = answers
+
+        return member_obj
+
+    def approve_pending_member(self, member_obj, text="Welcome to TJEE!"):
+        self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
+        member_list = self.driver.find_element(By.CLASS_NAME, f"member-item--{member_obj['meetup_id']}")
+        approve_button = member_list.find_element(By.CLASS_NAME, "approveButton")
+        approve_button.click()
+        view_modal = self.driver.find_element(By.CLASS_NAME, "view--modal")
+        name = view_modal.find_element(By.CLASS_NAME, "text--bold").text
+        if member_obj['meetup_name'] == name:
+            text_input = view_modal.find_element(By.TAG_NAME, "textarea")
+            text_input.clear()
+            text_input.send_keys(text)
+            buttons = view_modal.find_elements(By.TAG_NAME, "button")
+            for button in buttons:
+                if button.text == "メンバーを承認":
+                    # button.click()
+                    pass
+
+    def deny_pending_member(self, member_obj, text):
+        self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
+        member_list = self.driver.find_element(By.CLASS_NAME, f"member-item--{member_obj['meetup_id']}")
+        decline_button = member_list.find_element(By.CLASS_NAME, "declineButton")
+        decline_button.click()
+        view_modal = self.driver.find_element(By.CLASS_NAME, "view--modal")
+        name = view_modal.find_element(By.CLASS_NAME, "text--bold").text
+        if member_obj['meetup_name'] == name:
+            text_input = view_modal.find_element(By.TAG_NAME, "textarea")
+            text_input.clear()
+            text_input.send_keys(text)
+            buttons = view_modal.find_elements(By.TAG_NAME, "button")
+            for button in buttons:
+                if button.text == "メンバーの申請を断る":
+                    # button.click()
+                    pass
+
     def _get_total_members(self) -> list:
-        # list_data = soup.find_all('li', class_=re.compile("member-item"))
-
         large_pictures = self._get_large_pictures()
-
         self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/")
         self._scroll_down()
         soup = BeautifulSoup(self.driver.page_source)
-
         members_list = soup.find("ul", class_="list--infinite-scroll groupMembersList list")
         images = members_list.find_all("img", class_="avatar-print")
         members = members_list.find_all('h4', class_="text--bold text--ellipsisOneLine")
@@ -149,8 +233,6 @@ class Meetup:
             img_tag = soup.find_all(self._find_large_picture_tag)
 
             if len(img_tag) == 1:
-                print(f"THIS IS IMAGE {img_tag}")
-                print(f"THIS IS THE IMAGE TAG: {img_tag[0]}")
                 fullname = img_tag[0]['alt'].split(" ")
                 firstname = fullname[0]
                 lastname = ""
@@ -191,8 +273,16 @@ class Meetup:
         self.driver.quit()
 
 
-soup = Meetup()
-soup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
-soup.quit()
+member = {
+            'id': '350967659',
+            'name': 'Russ Pacheco',
+            'app_date': '2021/12/26',
+            'link': 'https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/350967659/profile/?returnPage=1'
+            }
 
-
+# soup = Meetup()
+# soup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
+# soup.get_pending_member_detail(member)
+# soup.quit()
+#
+#

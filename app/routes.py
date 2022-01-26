@@ -186,7 +186,7 @@ def message_delete(message_id):
 @app.route("/api/meetup/new-members/", methods=["GET"])
 @token_required
 def get_new_member_applications():
-    data = controller_get_new_member_application(db, NewMembers)
+    data = controller_get_new_member_application(NewMembers)
     return data
 
 

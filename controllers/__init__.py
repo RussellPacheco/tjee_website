@@ -194,9 +194,9 @@ def controller_line_delete_message(db, line_obj, message_id):
 #
 #########
 
-def controller_get_new_member_application(db, new_members_obj):
+def controller_get_new_member_application(new_members_obj):
     try:
-        data = service_get_new_member_application(db, new_members_obj)
+        data = service_get_new_member_application(new_members_obj)
         return data
 
     except Exception as e:

@@ -9,6 +9,7 @@ from .utils import send_message
 import requests
 import jwt
 from flask import current_app, jsonify
+from app.meetup_scraper import Meetup
 
 #########
 #
@@ -554,12 +555,29 @@ def service_line_delete_message(db, line_obj, message_id):
 #
 #########
 
-def service_get_new_member_application(db, new_members_obj):
-    # new_members_db_list = dao_get_all_new_members(new_members_obj)
+def service_get_new_member_application(new_members_obj):
+    results = dao_get_new_member_application(new_members_obj)
 
-    # something like all_apps = mercari_check_new_applications()
-    # and then
-    # get the meetup id from both and see which one is new, then saved to db the new one
+    status = {"status": 1}
+
+    if results is None:
+        return status
+
+    new_members = []
+
+    for meetup in results:
+
+        json_obj = {
+            "status": 0,
+            "meetup_id": meetup.id,
+            "meetup_name": meetup.name,
+            "link": message.link,
+            "created_at": message.created_at,
+            "last_sent": message.last_sent,
+            "last_modified": message.last_modified
+        }
+
+    return json_obj
 
     pass
 
