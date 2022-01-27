@@ -2,7 +2,7 @@ from app import app
 from controllers import *
 from app import db
 from app.models import Member, Admin, LineMessage, NewMembers, LineWebhooks, BotPermissions
-from flask import request
+from flask import request, render_template
 from functools import wraps
 
 
@@ -39,7 +39,7 @@ def token_required(f):
 
 @app.route("/")
 def index():
-    return "<p>Hello World</p>"
+    return render_template("index.html")
 
 #########
 #
@@ -184,9 +184,26 @@ def message_delete(message_id):
 #########
 
 @app.route("/api/meetup/new-members/", methods=["GET"])
-@token_required
 def get_new_member_applications():
-    data = controller_get_new_member_application(NewMembers)
+    data = controller_get_new_member_applications(NewMembers)
+    return data
+
+
+@app.route("/api/meetup/new-members/update", methods=["GET"])
+def update_new_member_applications():
+    data = controller_update_new_member_applications(db, NewMembers)
+    return data
+
+
+@app.route("/api/meetup/new-members/approve", methods=["POST"])
+def approve_new_member():
+    data = controller_approve_new_member(db, NewMembers, request.get_json())
+    return data
+
+
+@app.route("/api/meetup/new-members/deny", methods=["POST"])
+def deny_new_member():
+    data = controller_deny_new_member(db, NewMembers, request.get_json())
     return data
 
 

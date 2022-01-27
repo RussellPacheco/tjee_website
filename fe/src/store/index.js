@@ -7,32 +7,13 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    statusMessage: null,
-    adminLogin: false,
-    jwt: "",
-    admins: [{
-      id: 0,
-      member_id: "Default_member_id",
-      username: "Default_username",
-      firstname: "Default_firstname"
-    }],
-    pendingMember: {
-      id:0,
-      name:"Default Name",
-      app_date:"Default app. date",
-      link: "Default link",
-      answers: {
-        answer_one: "one",
-        answer_two: "two",
-        answer_three: "three"
-      }
-    },
-    pendingMembers: [{
-      id:0,
-      name:"Default Name",
-      app_date:"Default app. date",
-      link: "Default link",
-    }],
+    
+////////////
+//
+// Members
+//
+////////////
+
     unregistedMembers: [{
       id: 0,
       name: "Default",
@@ -54,21 +35,6 @@ export default new Vuex.Store({
       group_profile: "",
       is_pro_admin: ""
     }],
-    currentAdmin: {
-      id: 1,
-      member_id: "kj2jnd2kj32kjdsdsd",
-      username: "default_username",
-      password: "default_password",
-      created_at: "yesterday",
-      last_modified: "yesterday"
-      
-    },
-    botPermissions: [
-      {
-        permission_name: "default_name",
-        permission_value: false
-      }
-    ],
     members: [{
       id: 1,
       firstname: "Russell",
@@ -104,6 +70,34 @@ export default new Vuex.Store({
       meetup_name: "DEFAULT",
       created_at: "DEFAULT"
     },
+////////////
+//
+// Admin
+//
+////////////
+
+    adminLogin: false,
+    admins: [{
+      id: 0,
+      member_id: "Default_member_id",
+      username: "Default_username",
+      firstname: "Default_firstname"
+    }],
+    currentAdmin: {
+      id: 1,
+      member_id: "kj2jnd2kj32kjdsdsd",
+      username: "default_username",
+      password: "default_password",
+      created_at: "yesterday",
+      last_modified: "yesterday"
+      
+    },
+////////////
+//
+// Line
+//
+////////////
+
     messages: [
       {
         id: 1, 
@@ -131,7 +125,53 @@ export default new Vuex.Store({
       created_at: "Default Time",
       last_sent: "Default Time",
       last_modified: "Default Time"
-    }
+    },
+////////////
+//
+// Bot
+//
+////////////
+
+    botPermissions: [
+      {
+        permission_name: "default_name",
+        permission_value: false
+      }
+    ],
+
+////////////
+//
+// Meetup
+//
+////////////
+
+    pendingMember: {
+      id:0,
+      name:"Default Name",
+      app_date:"Default app. date",
+      link: "Default link",
+      answers: {
+        answer_one: "one",
+        answer_two: "two",
+        answer_three: "three"
+      }
+    },
+    pendingMembers: [{
+      id:0,
+      name:"Default Name",
+      app_date:"Default app. date",
+      link: "Default link",
+    }],
+
+////////////
+//
+// Other
+//
+////////////
+
+    statusMessage: null,
+    jwt: "",
+    
   },
   getters: {
     isAuthenticated(state) {
@@ -141,15 +181,13 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    setPendingMembers(state, payload) {
-      state.pendingMembers = payload
-    },
-    setAdminLoginToTrue(state) {
-      state.adminLogin = true
-    },
-    setAdmins(state, payload) {
-      state.admins = payload
-    },
+
+////////////
+//
+// Members
+//
+////////////
+
     setUnregisteredMembers(state, payload) {
       state.unregisteredMembers = payload.unregisteredMembers
       state.unregisteredMembers.push({name: "MEMBER DOESN'T EXIST"})
@@ -160,25 +198,69 @@ export default new Vuex.Store({
     setEditMember(state, payload) {
       state.editMember = payload
     },
+
+////////////
+//
+// Admin
+//
+////////////
+
+    setAdminLoginToTrue(state) {
+      state.adminLogin = true
+    },
+    setAdmins(state, payload) {
+      state.admins = payload
+    },
+    setCurrentAdmin(state, payload) {
+      state.currentAdmin = payload
+    },
+
+////////////
+//
+// Line
+//
+////////////
+
     setMessages(state, payload) {
       state.messages = payload
-    },
-    setStatusMessage(state, payload) {
-      state.statusMessage = payload
     },    
     setEditMessage(state, payload) {
       state.editMessage = payload
     },
+
+////////////
+//
+// Bot
+//
+////////////
+
     setBotPermissions(state, payload) {
       state.botPermissions = payload
+    },
+
+////////////
+//
+// Meetup
+//
+////////////
+
+    setPendingMembers(state, payload) {
+      state.pendingMembers = payload
+    },
+
+////////////
+//
+// Other
+//
+////////////
+
+    setStatusMessage(state, payload) {
+      state.statusMessage = payload
     },
     setJwtToken(state, payload) {
       localStorage.token = payload.jwt.token
       state.jwt = payload.jwt
     },
-    setCurrentAdmin(state, payload) {
-      state.currentAdmin = payload
-    }
   },
   actions: {
 ////////////
@@ -212,19 +294,6 @@ export default new Vuex.Store({
         if (res.data.status == 0) {
           commit("setMembers", res.data.members)          
         }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-
-    async getPendingMembers({ commit }) {
-      try {
-        const auth = { headers: { Authorization: this.state.jwt } }
-        const res = await axios.get("/api/members/pending", auth)
-        if (res.data.status == 0) {
-          commit("setPendingMembers", res.data.pending_members)
-        }
-
       } catch (err) {
         console.error(err)
       }
@@ -267,7 +336,7 @@ export default new Vuex.Store({
 
     },
 
-    async getData({ commit }) {
+    async getData({ commit, dispatch }) {
       try {
 
         const auth = { headers: { Authorization: this.state.jwt } }
@@ -286,6 +355,9 @@ export default new Vuex.Store({
 
         const admins = await axios.get("/api/admins", auth)
         commit("setAdmins", admins.data.admins)
+
+        dispatch("getPendingMembers")
+        dispatch("updatePendingMembers")
 
       } catch (err) {
         console.error(err)
@@ -371,7 +443,59 @@ export default new Vuex.Store({
       } catch (err) {
         console.error(err)
       }
-    }
+    },
+
+////////////
+//
+// Meetup
+//
+////////////
+    async getPendingMembers({ commit }) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.get("/api/meetup/new-members/", auth)
+        if (res.data.status == 0) {
+          commit("setPendingMembers", res.data.pending_members)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async updatePendingMembers({ commit }) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.get("/api/meetup/new-members/update/", auth)
+        if (res.data.status == 0) {
+          commit("setPendingMembers", res.data.pending_members)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async approvePendingMember({ commit }, payload) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.post("/api/meetup/new-members/approve/", payload, auth)
+        if (res.data.status == 0) {
+          commit("setPendingMembers", res.data.pending_members)
+        }
+
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async denyPendingMember({ commit }, payload) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.post("/api/meetup/new-members/deny/", payload, auth)
+        if (res.data.status == 0) {
+          commit("setPendingMembers", res.data.pending_members)
+        }
+
+      } catch (err) {
+        console.error(err)
+      }
+    },
   },
   modules: {
   }

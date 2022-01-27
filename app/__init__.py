@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from flask_cors import CORS
+from whitenoise import WhiteNoise
 
 load_dotenv()
 
@@ -14,6 +15,7 @@ DB_CONNECTION = os.environ.get("DB_CONNECTION")
 SQLALCHEMY_DATABASE = f'postgresql://{DB_CONNECTION}'
 
 app = Flask(__name__)
+app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/')
 app.url_map.strict_slashes = False
 app.secret_key = os.environ.get("SECRET_TOKEN")
 CORS(app, origins=["http://localhost:8080", "http://localhost:5000"])

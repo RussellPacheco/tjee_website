@@ -91,7 +91,6 @@ def dao_line_save_webhook(db, webhook_obj, line_type, timestamp, userId=None, gr
 
 
 def dao_line_get_webhook(webhook_obj, userId=None, groupId=None, line_type=None):
-
     if line_type in ["leave", "memberJoined", "memberLeft"]:
         result = webhook_obj.query.filter_by(type=line_type, groupId=groupId).order_by(webhook_obj.timestamp).first()
         return result
@@ -114,7 +113,8 @@ def dao_line_get_all_bot_permissions(bot_permission_obj):
 
 
 def dao_line_change_bot_permission(db, bot_permission_obj, permission_name, permission_value, last_modified):
-    bot_permission_obj.query.filter_by(permission_name=permission_name).update(dict(permission_value=permission_value, last_modified=last_modified))
+    bot_permission_obj.query.filter_by(permission_name=permission_name).update(
+        dict(permission_value=permission_value, last_modified=last_modified))
     db.session.commit()
 
 
@@ -159,3 +159,17 @@ def dao_line_delete_message(db, line_obj, message_id):
 def dao_get_new_member_application(new_members_obj):
     results = new_members_obj.query.all()
     return results
+
+
+def dao_remove_new_member_by_id(db, new_member_obj, meetup_id):
+    new_member = new_member_obj.query.filter_by(meetup_id=meetup_id).first()
+    db.session.delete(new_member)
+    db.session.commit()
+
+
+def dao_save_new_member(db, new_member_obj, meetup_id, meetup_name, created_at, app_date, link, answer_one, answer_two,
+                        answer_three):
+    new_member = new_member_obj(meetup_id=meetup_id, meetup_name=meetup_name, created_at=created_at, app_date=app_date,
+                                link=link, answer_one=answer_one, answer_two=answer_two, answer_three=answer_three)
+    db.session.add(new_member)
+    db.session.commit()

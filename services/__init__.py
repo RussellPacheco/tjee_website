@@ -1,3 +1,4 @@
+import dotenv
 import base64
 import hmac
 import binascii
@@ -11,6 +12,7 @@ import jwt
 from flask import current_app, jsonify
 from app.meetup_scraper import Meetup
 
+dotenv.load_dotenv()
 #########
 #
 # Members
@@ -42,8 +44,6 @@ def service_create_member(db, member_obj, json_data):
         if "meetup_name" in json_data:
             meetup_name = json_data["meetup_name"]
 
-        print("about to create member")
-
         result = dao_create_member(
             db,
             member_obj,
@@ -59,9 +59,6 @@ def service_create_member(db, member_obj, json_data):
             meetup_name=meetup_name
         )
         status["status"] = 0
-        print(result)
-        print("member created")
-
         return status
 
     else:
@@ -555,31 +552,93 @@ def service_line_delete_message(db, line_obj, message_id):
 #
 #########
 
-def service_get_new_member_application(new_members_obj):
+def service_get_new_member_applications(new_members_obj):
     results = dao_get_new_member_application(new_members_obj)
-
     status = {"status": 1}
-
     if results is None:
         return status
-
     new_members = []
-
     for meetup in results:
-
-        json_obj = {
-            "status": 0,
-            "meetup_id": meetup.id,
-            "meetup_name": meetup.name,
-            "link": message.link,
-            "created_at": message.created_at,
-            "last_sent": message.last_sent,
-            "last_modified": message.last_modified
+        new_member = {
+            "id": meetup.id,
+            "meetup_id": meetup.meetup_id,
+            "meetup_name": meetup.meetup_name,
+            "link": meetup.link,
+            "created_at": meetup.created_at,
+            "app_date": meetup.app_date,
+            "answer_one": meetup.answer_one,
+            "answer_two": meetup.answer_two,
+            "answer_three": meetup.answer_three
         }
+        new_members.append(new_member)
+    status["status"] = 0
+    status["pending_members"] = new_members
+    return status
 
-    return json_obj
 
-    pass
+def service_update_new_member_applications(db, new_member_obj):
+    meetup = Meetup()
+    meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
+    meetup_pending_members = meetup.get_pending_members()
+    dao_pending_members = service_get_new_member_applications(new_member_obj)
+    members_to_save = []
+
+    if len(dao_pending_members["pending_members"]) != 0:
+        for meetup_member in meetup_pending_members:
+            exists = False
+            for dao_member in dao_pending_members["pending_members"]:
+                if meetup_member["meetup_id"] == dao_member["meetup_id"]:
+                    exists = True
+
+            if not exists:
+                meetup_member = meetup.get_pending_member_detail(meetup_member)
+                members_to_save.append(meetup_member)
+
+        for member in members_to_save:
+            dao_save_new_member(db, new_member_obj,
+                                meetup_id=member["meetup_id"],
+                                meetup_name=member["meetup_name"],
+                                created_at=member["created_at"],
+                                app_date=member["app_date"],
+                                link=member["link"],
+                                answer_one=member["answer_one"],
+                                answer_two=member["answer_two"],
+                                answer_three=member["answer_three"])
+    else:
+        for member in meetup_pending_members:
+            member = meetup.get_pending_member_detail(member)
+
+            dao_save_new_member(db, new_member_obj,
+                                meetup_id=member["meetup_id"],
+                                meetup_name=member["meetup_name"],
+                                created_at=datetime.now(),
+                                app_date=member["app_date"],
+                                link=member["link"],
+                                answer_one=member["answers"]["answer_one"],
+                                answer_two=member["answers"]["answer_two"],
+                                answer_three=member["answers"]["answer_three"])
+
+
+
+    meetup.quit()
+    new_member_apps = service_get_new_member_applications(new_member_obj)
+    return new_member_apps
+
+
+def service_approve_new_member(db, new_member_obj, json_obj):
+    meetup = Meetup()
+    meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
+    meetup.approve_pending_member(json_obj)
+    dao_remove_new_member_by_id(db, new_member_obj, meetup_id=json_obj["meetup_id"])
+    return service_get_new_member_applications(new_member_obj)
+
+
+def service_deny_new_member(db, new_member_obj, json_obj):
+    meetup = Meetup()
+    meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
+    meetup.deny_pending_member(json_obj)
+    dao_remove_new_member_by_id(db, new_member_obj, meetup_id=json_obj["meetup_id"])
+    return service_get_new_member_applications(new_member_obj)
 
 
 def service_get_current_members(member_obj):

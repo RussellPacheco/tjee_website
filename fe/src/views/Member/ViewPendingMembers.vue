@@ -15,20 +15,30 @@
     <b-container>
         <b-row class="mt-5">
             <b-col></b-col>
-            <b-col cols="12">
+            <b-col cols="16">
                 <b-table striped hover :items="items" :fields="fields" @row-clicked="handleRowClick">
-                    <template #cell(name)="data"><a v-b-modal.edit-modal>{{data.value}}</a></template>
-                    <template #cell(app_date)="data">{{data.value}}</template>
+                    <template #cell(link)="data"><a :href="`${data.value}`">{{data.value}}</a></template>
                 </b-table>
             </b-col>
             <b-col></b-col>
         </b-row>
     </b-container>                
-    <b-modal ref="edit-modal" hide-header-close no-close-on-backdrop title="Your Selected Pending Member" size="lg" ok-title="Get More Details" @ok="handleGetMoreDetails">
+    <b-modal ref="approvedeny-modal" hide-header-close no-close-on-backdrop hide-footer title="Would you like to approve or deny this" size="xl" ok-title="Get More Details" @ok="handleGetMoreDetails">
         <b-container>
             <b-row>
                 <b-col>
                     <b-table striped :items="[pendingMember]" :fields="modalFields"></b-table>
+                </b-col>
+            </b-row>
+            <b-row class="mt-5">
+                <b-col>
+                    <b-button variant="success" @click="handleApprove">Approve</b-button>
+                </b-col>
+                <b-col class="d-flex justify-content-center">
+                    <b-button  @click="cancelModal">Cancel</b-button>
+                </b-col>
+                <b-col class="d-flex justify-content-end">
+                    <b-button variant="danger" @click="handleDeny">Deny</b-button>
                 </b-col>
             </b-row>
         </b-container>
@@ -44,21 +54,29 @@ export default {
         return {
             pendingMember: {
                 id: "",
-                name: "",
+                meetup_name: "",
                 app_date: "",
                 link: ""
             },
 
             fields:[
-                {key:"name", label: "Name"},
+                {key:"meetup_name", label: "Name"},
                 {key:"app_date", label:"申請日"},
+                {key:"answer_one", label:"Answer 1"},
+                {key:"answer_two", label:"Answer 2"},
+                {key:"answer_three", label:"Answer 3"},
+                {key:"link", label:"Link"}
             ],
 
             items: this.$store.state.pendingMembers,
 
             modalFields: [
-                {key:"name", label: "Name"},
+                {key:"meetup_name", label: "Name"},
                 {key:"app_date", label:"申請日"},
+                {key:"answer_one", label:"Answer 1"},
+                {key:"answer_two", label:"Answer 2"},
+                {key:"answer_three", label:"Answer 3"},
+                {key:"link", label:"Link"}
             ],
 
         }
@@ -67,17 +85,27 @@ export default {
     methods: {
         handleRowClick(item) {
             this.pendingMember = item
-            this.$refs['edit-modal'].show()
+            this.$refs['approvedeny-modal'].show()
         },
 
         cancelModal() {
-            this.$refs['edit-modal'].hide()
+            this.$refs['approvedeny-modal'].hide()
         },
 
-        handleGetMoreDetails() {46
+        handleGetMoreDetails() {
             this.$store.commit("setPendingMember", this.pendingMember)
             this.$router.push({name: 'PendingMemberDetails'})
+        },
+
+        handleApprove() {
+            this.$store.dispatch("approvePendingMember", this.pendingMember)
+            this.$refs['approvedeny-modal'].hide()
+        },
+        handleDeny() {
+            this.$store.dispatch("denyPendingMember", this.pendingMember)
+            this.$refs['approvedeny-modal'].hide()
         }
+
 
     }
 

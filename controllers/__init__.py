@@ -63,6 +63,7 @@ def controller_admin_get_all(admin_obj):
         print(e)
         return str(e)
 
+
 def controller_admin_create(db, admin_obj, json_data):
     try:
         data = service_admin_create(db, admin_obj, json_data)
@@ -194,11 +195,38 @@ def controller_line_delete_message(db, line_obj, message_id):
 #
 #########
 
-def controller_get_new_member_application(new_members_obj):
+def controller_get_new_member_applications(new_members_obj):
     try:
-        data = service_get_new_member_application(new_members_obj)
+        data = service_get_new_member_applications(new_members_obj)
         return data
 
+    except Exception as e:
+        print(e)
+        return str(e)
+
+
+def controller_update_new_member_applications(db, new_member_obj):
+    try:
+        data = service_update_new_member_applications(db, new_member_obj)
+        return data
+    except Exception as e:
+        print(e)
+        return str(e)
+
+
+def controller_approve_new_member(db, new_member_obj, json_obj):
+    try:
+        data = service_approve_new_member(db, new_member_obj, json_obj)
+        return data
+    except Exception as e:
+        print(e)
+        return str(e)
+
+
+def controller_deny_new_member(db, new_member_obj, json_obj):
+    try:
+        data = service_deny_new_member(db, new_member_obj, json_obj)
+        return data
     except Exception as e:
         print(e)
         return str(e)

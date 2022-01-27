@@ -13,6 +13,7 @@ import time
 
 dotenv.load_dotenv()
 
+
 class Meetup:
     def __init__(self):
         ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -58,18 +59,20 @@ class Meetup:
         """"A method for scrolling the page."""
         self.driver.execute_script("window.scrollTo(0, 0);")
 
-    def login(self, email: str, password: str) -> BeautifulSoup:
+    def login(self, email: str, password: str):
         self.driver.get("https://www.meetup.com/login")
 
         WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, "email")))
-
         emailInput = self.driver.find_element(By.ID, "email")
         emailInput.send_keys(email)
         passwordInput = self.driver.find_element(By.ID, "current-password")
         passwordInput.send_keys(password + Keys.ENTER)
 
-        WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located(
-            (By.XPATH, "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
+        try:
+            WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
+        except Exception as e:
+            print(f"There was an exception: {e}")
+            pass
 
     def get_pending_members(self) -> list:
         self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
@@ -134,7 +137,7 @@ class Meetup:
             buttons = view_modal.find_elements(By.TAG_NAME, "button")
             for button in buttons:
                 if button.text == "メンバーを承認":
-                    # button.click()
+                    button.click()
                     pass
 
     def deny_pending_member(self, member_obj, text):
@@ -151,11 +154,10 @@ class Meetup:
             buttons = view_modal.find_elements(By.TAG_NAME, "button")
             for button in buttons:
                 if button.text == "メンバーの申請を断る":
-                    # button.click()
+                    button.click()
                     pass
 
     def _get_total_members(self) -> list:
-        large_pictures = self._get_large_pictures()
         self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/")
         self._scroll_down()
         soup = BeautifulSoup(self.driver.page_source)
@@ -215,11 +217,7 @@ class Meetup:
 
         soup = BeautifulSoup(self.driver.page_source, features="html.parser")
 
-        # WebDriverWait(self.driver, 10).until(expected_conditions.presence_of_element_located({By.CLASS_NAME: 'list--infinite-scroll groupMembersList list'}))
         WebDriverWait(self.driver, 10).until(expected_conditions.presence_of_element_located([By.TAG_NAME, 'ul']))
-
-        list_tag = self.driver.find_element(By.CLASS_NAME, 'groupMembersList')
-        all_lists = list_tag.find_elements(By.CLASS_NAME, "member-item")
 
         group_member_list = soup.find(class_="groupMembersList")
         a_tag = group_member_list.find_all("li")
@@ -271,18 +269,3 @@ class Meetup:
 
     def quit(self):
         self.driver.quit()
-
-
-member = {
-            'id': '350967659',
-            'name': 'Russ Pacheco',
-            'app_date': '2021/12/26',
-            'link': 'https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/350967659/profile/?returnPage=1'
-            }
-
-# soup = Meetup()
-# soup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
-# soup.get_pending_member_detail(member)
-# soup.quit()
-#
-#
