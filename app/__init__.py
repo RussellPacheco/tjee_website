@@ -9,6 +9,22 @@ from whitenoise import WhiteNoise
 
 load_dotenv()
 
+print(f"""
+
+    The logged in user is {os.getlogin()}
+
+    The os name is {os.name}
+
+""")
+
+if os.name != "posix":
+    print(f"""
+
+    The uname is {os.uname()}
+
+    """)
+
+
 DB_USER = os.environ.get("DB_USER")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 DB_CONNECTION = os.environ.get("DB_CONNECTION")
