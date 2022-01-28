@@ -64,11 +64,14 @@ class Meetup:
         self.driver.execute_script("window.scrollTo(0, 0);")
 
     def login(self, email: str, password: str):
+        print("getting page")
         self.driver.get("https://www.meetup.com/login")
-
+        print("waiting for element to display")
         WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, "email")))
+        print("looking for email element")
         emailInput = self.driver.find_element(By.ID, "email")
         emailInput.send_keys(email)
+        print("looking for password element")
         passwordInput = self.driver.find_element(By.ID, "current-password")
         passwordInput.send_keys(password + Keys.ENTER)
 

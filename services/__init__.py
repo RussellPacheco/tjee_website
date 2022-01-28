@@ -583,6 +583,8 @@ def service_update_new_member_applications(db, new_member_obj):
     meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
     print("logged in")
     meetup_pending_members = meetup.get_pending_members()
+    print("got pending members")
+    print(meetup_pending_members)
     dao_pending_members = service_get_new_member_applications(new_member_obj)
     members_to_save = []
 
