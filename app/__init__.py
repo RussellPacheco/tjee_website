@@ -11,8 +11,6 @@ load_dotenv()
 
 print(f"""
 
-    The logged in user is {os.getlogin()}
-
     The os name is {os.name}
 
 """)
