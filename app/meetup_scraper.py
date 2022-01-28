@@ -16,6 +16,7 @@ dotenv.load_dotenv()
 
 class Meetup:
     def __init__(self):
+        print("initializing the meetup class")
         ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
         DRIVER_PATH = None
 

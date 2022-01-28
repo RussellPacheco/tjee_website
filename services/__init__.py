@@ -99,7 +99,7 @@ def service_get_all_members(member_obj):
     members = []
     status = {"status": 1}
 
-    if len(data) == 0:
+    if data is None or len(data) == 0:
         return status
 
     for member in data:
@@ -427,7 +427,7 @@ def service_line_get_bot_permissions(bot_permission_obj):
 
     status = {"status": 1}
 
-    if len(data) == 0:
+    if data is None or len(data) == 0:
         return status
 
     for permission in data:
@@ -475,7 +475,7 @@ def service_line_get_all_messages(line_obj):
 
     status = {"status": 1}
 
-    if len(data) == 0:
+    if data is None or len(data) == 0:
         return status
 
     for message in data:
@@ -583,7 +583,7 @@ def service_update_new_member_applications(db, new_member_obj):
     dao_pending_members = service_get_new_member_applications(new_member_obj)
     members_to_save = []
 
-    if len(dao_pending_members["pending_members"]) != 0:
+    if dao_pending_members["pending_members"] is None or len(dao_pending_members["pending_members"]) != 0:
         for meetup_member in meetup_pending_members:
             exists = False
             for dao_member in dao_pending_members["pending_members"]:
