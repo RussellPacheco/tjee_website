@@ -19,6 +19,21 @@ class Meetup:
         ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
         DRIVER_PATH = None
 
+        print(f"""
+            
+            The logged in user is {os.getlogin()}
+
+            The os name is {os.name}
+
+        """)
+
+        if os.name != "posix":
+            print(f"""
+
+            The uname is {os.uname()}
+
+            """)
+
         if os.name == "nt":
             DRIVER_PATH = os.path.join(ROOT_PATH, "resources/chromedriver.exe")
         elif os.name == "posix":
