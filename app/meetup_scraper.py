@@ -22,11 +22,14 @@ class Meetup:
         if os.name == "nt":
             DRIVER_PATH = os.path.join(ROOT_PATH, "resources/chromedriver.exe")
         elif os.name == "posix":
-            DRIVER_PATH = os.path.join(ROOT_PATH, "resources/chromedriver")
+            DRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 
         OPTIONS = Options()
+        OPTIONS.binary_location = os.getenv("GOOGLE_CHROME_BIN")
         OPTIONS.headless = True
         OPTIONS.add_argument("--incognito")
+        OPTIONS.add_argument("--disable-gpu")
+        OPTIONS.add_argument("--no-sandbox")
 
         self.driver = webdriver.Chrome(options=OPTIONS, service=Service(DRIVER_PATH))
 
