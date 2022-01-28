@@ -15,7 +15,7 @@ print(f"""
 
 """)
 
-if os.name != "posix":
+if os.name == "posix":
     print(f"""
 
     The uname is {os.uname()}
