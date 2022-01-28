@@ -84,9 +84,11 @@ class Meetup:
     def get_pending_members(self) -> list:
         print("in get pending members and getting link")
         self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
+        print(f"driver title {self.driver.title}")
         self._scroll_down()
         soup = BeautifulSoup(self.driver.page_source, features="html.parser")
         print("got soup and getting pending member list")
+        print(soup)
         pending_member_list = soup.find("ul", class_="groupMembersList")
         print(f"got list {pending_member_list}")
         individual_list = pending_member_list.find_all("li")
