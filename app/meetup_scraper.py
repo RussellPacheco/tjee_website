@@ -74,9 +74,10 @@ class Meetup:
         print("looking for password element")
         passwordInput = self.driver.find_element(By.ID, "current-password")
         passwordInput.send_keys(password + Keys.ENTER)
+        print("sent password")
 
         try:
-            WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
+            WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located((By., "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
         except Exception as e:
             print(f"There was an exception: {e}")
             pass
@@ -88,7 +89,6 @@ class Meetup:
         self._scroll_down()
         soup = BeautifulSoup(self.driver.page_source, features="html.parser")
         print("got soup and getting pending member list")
-        print(soup)
         pending_member_list = soup.find("ul", class_="groupMembersList")
         print(f"got list {pending_member_list}")
         individual_list = pending_member_list.find_all("li")
