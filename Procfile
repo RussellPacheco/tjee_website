@@ -1,1 +1,1 @@
-web: gunicorn main:appworker: celery worker --app=app.celery --loglevel=INFO
+web: gunicorn main:appworker: celery --app=app.celery worker --loglevel=INFO

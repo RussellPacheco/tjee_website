@@ -25,7 +25,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['CELERY_BROKER_URL'] = os.getenv("CLOUDAMQP_URL")
 app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
 db = SQLAlchemy(app)
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, BROKER_URL=os.getenv("CLOUDAMQP_URL"))
 
 
 ###
