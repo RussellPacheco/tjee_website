@@ -30,7 +30,7 @@ def token_required(f):
                 raise RuntimeError('Admin not found')
             return f(*args, **kwargs)
         except jwt.ExpiredSignatureError:
-            return jsonify(expired_msg), 401 # 401 is Unauthorized HTTP status code
+            return jsonify(expired_msg), 401  # 401 is Unauthorized HTTP status code
         except jwt.InvalidTokenError:
             return jsonify(invalid_msg), 401
 
@@ -40,6 +40,7 @@ def token_required(f):
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 #########
 #
@@ -80,11 +81,13 @@ def admin_login():
     data = controller_admin_login(Admin, request.get_json())
     return data
 
+
 @app.route("/api/admins", methods=["GET"])
 @token_required
 def admin_get_all():
     data = controller_admin_get_all(Admin)
     return data
+
 
 @app.route("/api/admins/create/", methods=["POST"])
 @token_required
@@ -116,7 +119,12 @@ def admin_change_password():
 @app.route("/api/line/", methods=["POST"])
 @token_required
 def webhook():
-    data = controller_line_webhook(db=db, webhook_obj=LineWebhooks, bot_permission_obj=BotPermissions, body=request.get_data(as_text=True), headers=request.headers, json_data=request.get_json())
+    data = controller_line_webhook(db=db,
+                                   webhook_obj=LineWebhooks,
+                                   bot_permission_obj=BotPermissions,
+                                   body=request.get_data(as_text=True),
+                                   headers=request.headers,
+                                   json_data=request.get_json())
     # data = controller_line_webhook(db, LineWebhooks, request.get_json())
     return data
 
@@ -191,7 +199,7 @@ def get_new_member_applications():
 
 @app.route("/api/meetup/new-members/update", methods=["GET"])
 def update_new_member_applications():
-    data = controller_update_new_member_applications(db, NewMembers)
+    data = controller_update_new_member_applications()
     return data
 
 

@@ -13,7 +13,7 @@
         </b-row>
         <b-row class="mt-5">
             <b-col></b-col>
-            <b-col cols="10">
+            <b-col sm="8" lg="8">
                 <div class="accordion" role="tablist">
                     <b-card no-body class="mb-1">
                         <b-card-header header-tag="header" class="p-1" role="tab">

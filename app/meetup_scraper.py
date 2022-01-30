@@ -90,10 +90,8 @@ class Meetup:
         soup = BeautifulSoup(self.driver.page_source, features="html.parser")
         print("got soup and getting pending member list")
         pending_member_list = soup.find("ul", class_="groupMembersList")
-        print(f"got list {pending_member_list}")
         individual_list = pending_member_list.find_all("li")
         print("this is indiividual list")
-        print(individual_list)
 
         pending_members = []
 

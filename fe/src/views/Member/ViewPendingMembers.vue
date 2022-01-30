@@ -50,6 +50,10 @@
 <script>
 export default {
     name: "ViewPendingMembers",
+    beforeCreate() {
+        this.$store.dispatch("getPendingMembers")
+    },
+
     data() {
         return {
             pendingMember: {

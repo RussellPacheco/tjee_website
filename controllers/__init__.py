@@ -205,9 +205,9 @@ def controller_get_new_member_applications(new_members_obj):
         return str(e)
 
 
-def controller_update_new_member_applications(db, new_member_obj):
+def controller_update_new_member_applications():
     try:
-        data = service_update_new_member_applications(db, new_member_obj)
+        data = service_update_new_member_applications()
         return data
     except Exception as e:
         print(e)

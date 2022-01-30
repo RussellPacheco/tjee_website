@@ -11,12 +11,7 @@
         <b-row>
             <b-col>
                 <b-row>
-                    <b-col class="d-flex justify-content-center" id="imgBox">
-                        <b-img rounded="circle" id="userImage" :src="selectedMember.photo.photo_link" />
-                    </b-col>
-                </b-row>
-                <b-row>
-                    <b-col class="mt-4">
+                    <b-col class="mb-4">
                         <b-card bg-variant="light">
                             <b-form-group
                                 label="① Check"
@@ -42,8 +37,13 @@
                         </b-card>
                     </b-col>
                 </b-row>
+                <b-row>
+                    <b-col class="d-flex justify-content-center mb-4" id="imgBox">
+                        <b-img rounded="circle" id="userImage" :src="selectedMember.photo.photo_link" />
+                    </b-col>
+                </b-row>                
             </b-col>
-            <b-col cols="8">
+            <b-col>
                 <b-card bg-variant="light">
                     <b-form-group
                         label-cols-lg="3"

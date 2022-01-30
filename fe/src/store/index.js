@@ -246,6 +246,7 @@ export default new Vuex.Store({
 
     setPendingMembers(state, payload) {
       state.pendingMembers = payload
+      console.log(state.pendingMembers)
     },
 
 ////////////
@@ -461,13 +462,11 @@ export default new Vuex.Store({
         console.error(err)
       }
     },
-    async updatePendingMembers({ commit }) {
+    async updatePendingMembers() {
       try {
         const auth = { headers: { Authorization: this.state.jwt } }
-        const res = await axios.get("/api/meetup/new-members/update/", auth)
-        if (res.data.status == 0) {
-          commit("setPendingMembers", res.data.pending_members)
-        }
+        await axios.get("/api/meetup/new-members/update/", auth)
+
       } catch (err) {
         console.error(err)
       }

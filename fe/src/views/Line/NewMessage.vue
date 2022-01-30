@@ -13,7 +13,7 @@
     <b-container class="mt-5">
         <b-row>
             <b-col></b-col>
-            <b-col cols="6">
+            <b-col sm="8" lg="12">
                 <b-input placeholder="Write a title..." v-model="title"></b-input>
                 <b-form-textarea
                 id="textarea"

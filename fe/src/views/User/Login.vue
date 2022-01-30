@@ -3,7 +3,7 @@
     <b-container>
         <b-row>
             <b-col></b-col>
-            <b-col class="login p-5" cols="4">
+            <b-col class="login p-5" sm="8" lg="4">
                 <b-form  @submit.stop.prevent>
                     <label for="feedback-user">User ID</label>
                     <b-form-input v-model="user.username" :state="validation" id="feedback-user"></b-form-input>
