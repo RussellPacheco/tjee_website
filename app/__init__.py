@@ -22,10 +22,12 @@ app.secret_key = os.environ.get("SECRET_TOKEN")
 CORS(app, origins=["http://localhost:8080", "http://localhost:5000"])
 app.config["SQLALCHEMY_DATABASE_URI"] = f'postgresql://{DB_CONNECTION}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['CELERY_BROKER_URL'] = os.getenv("CLOUDAMQP_URL")
-app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
+app.config.update(celery_broker_url=os.getenv("CLOUDAMQP_URL"),
+                  celery_result_backend='rpc://',
+                  broker_pool_limit=1,
+                  )
+
 db = SQLAlchemy(app)
-celery = Celery(app.name, BROKER_URL=os.getenv("CLOUDAMQP_URL"))
 
 
 ###

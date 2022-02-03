@@ -582,7 +582,7 @@ def service_get_new_member_applications(new_members_obj):
 def service_update_new_member_applications():
     print("got in from route to service_update_new_member_applications")
     print("going into celery")
-    update_new_members.delay()
+    result = update_new_members.delay()
     print("returning from service_update_new_member_applications")
     return {"status": 0}
 

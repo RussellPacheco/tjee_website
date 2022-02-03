@@ -1,19 +1,33 @@
 from dotenv import load_dotenv
-from app import celery
+from app import app
 from app.meetup_scraper import Meetup
 import os
 import services
 import dao
 from datetime import datetime
 from app.models import db, NewMembers
+from celery import Celery
 
 load_dotenv()
 
 
-@celery.task
+celery = Celery(app.name, broker_url=os.getenv("CLOUDAMQP_URL"))
+celery.conf.update(app.config)
+
+
+class ContextTask(celery.Task):
+    def __call__(self, *args, **kwargs):
+        with app.app_context():
+            return self.run(*args, **kwargs)
+
+
+celery.Task = ContextTask
+
+
+@celery.task()
 def update_new_members():
+    print("inside new members")
     new_member_obj = NewMembers
-    print("inside new members in celery task")
     meetup = Meetup()
     meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
     print("logged in")
