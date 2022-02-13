@@ -25,6 +25,8 @@ class Meetup:
         elif os.name == "posix":
             DRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 
+        print(DRIVER_PATH)
+
         OPTIONS = Options()
         OPTIONS.binary_location = os.getenv("GOOGLE_CHROME_BIN")
         OPTIONS.headless = True

@@ -6,8 +6,7 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from flask_cors import CORS
 from whitenoise import WhiteNoise
-from celery import Celery
-
+from make_celery import make_celery
 load_dotenv()
 
 DB_USER = os.environ.get("DB_USER")
@@ -22,10 +21,11 @@ app.secret_key = os.environ.get("SECRET_TOKEN")
 CORS(app, origins=["http://localhost:8080", "http://localhost:5000"])
 app.config["SQLALCHEMY_DATABASE_URI"] = f'postgresql://{DB_CONNECTION}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config.update(celery_broker_url=os.getenv("CLOUDAMQP_URL"),
-                  celery_result_backend='rpc://',
-                  broker_pool_limit=1,
+app.config.update(CELERY_BROKER_URL=os.getenv("CLOUDAMQP_URL"),
+                  BROKER_POOL_LIMIT=1,
                   )
+
+celery = make_celery(app)
 
 db = SQLAlchemy(app)
 
@@ -40,4 +40,4 @@ engine = create_engine(f"postgresql://{DB_CONNECTION}")
 if not database_exists(engine.url):
     create_database(engine.url)
 
-from app import routes, models, scraper
+from app import celery_routes, routes, models

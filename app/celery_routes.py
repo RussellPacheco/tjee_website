@@ -1,27 +1,8 @@
-from dotenv import load_dotenv
-from app import app
+from app import celery
 from app.meetup_scraper import Meetup
-import os
-import services
-import dao
+import os, services, dao
 from datetime import datetime
 from app.models import db, NewMembers
-from celery import Celery
-
-load_dotenv()
-
-
-celery = Celery(app.name, broker_url=os.getenv("CLOUDAMQP_URL"))
-celery.conf.update(app.config)
-
-
-class ContextTask(celery.Task):
-    def __call__(self, *args, **kwargs):
-        with app.app_context():
-            return self.run(*args, **kwargs)
-
-
-celery.Task = ContextTask
 
 
 @celery.task()
