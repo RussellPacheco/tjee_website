@@ -16,7 +16,6 @@ dotenv.load_dotenv()
 
 class Meetup:
     def __init__(self):
-        print("initializing the meetup class")
         ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
         DRIVER_PATH = None
 
@@ -24,8 +23,6 @@ class Meetup:
             DRIVER_PATH = os.path.join(ROOT_PATH, "resources/chromedriver.exe")
         elif os.name == "posix":
             DRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
-
-        print(DRIVER_PATH)
 
         OPTIONS = Options()
         OPTIONS.binary_location = os.getenv("GOOGLE_CHROME_BIN")
@@ -66,35 +63,24 @@ class Meetup:
         self.driver.execute_script("window.scrollTo(0, 0);")
 
     def login(self, email: str, password: str):
-        print("getting page")
         self.driver.get("https://www.meetup.com/login")
-        print("waiting for element to display")
         WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, "email")))
-        print("looking for email element")
         emailInput = self.driver.find_element(By.ID, "email")
         emailInput.send_keys(email)
-        print("looking for password element")
         passwordInput = self.driver.find_element(By.ID, "current-password")
         passwordInput.send_keys(password + Keys.ENTER)
-        print("sent password")
 
         try:
             WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_any_elements_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div/main/div[1]/div/div[2]/div[2]/div/div/div/div/a")))
         except Exception as e:
-            print(f"There was an exception: {e}")
             pass
 
     def get_pending_members(self) -> list:
-        print("in get pending members and getting link")
         self.driver.get("https://www.meetup.com/ja-JP/TJEE-Tokyo-Japanese-English-exchange/members/?op=pending")
-        print(f"driver title {self.driver.title}")
         self._scroll_down()
         soup = BeautifulSoup(self.driver.page_source, features="html.parser")
-        print("got soup and getting pending member list")
         pending_member_list = soup.find("ul", class_="groupMembersList")
         individual_list = pending_member_list.find_all("li")
-        print("this is indiividual list")
-
         pending_members = []
 
         for li in individual_list:
