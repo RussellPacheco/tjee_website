@@ -69,6 +69,11 @@ def member_get_all():
     data = controller_get_all_members(Member)
     return data
 
+@app.route("/api/members/update/", methods=["POST"])
+@token_required
+def member_update():
+    data = controller_member_update(db, Member, request.get_json())
+    return data
 
 #########
 #
@@ -94,7 +99,6 @@ def admin_get_all():
 def admin_create():
     data = controller_admin_create(db, Admin, request.get_json())
     return data
-
 
 @app.route("/api/admins/delete/", methods=["DELETE"])
 @token_required

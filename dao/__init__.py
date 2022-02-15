@@ -32,6 +32,22 @@ def dao_get_all_members(member_obj):
     results = member_obj.query.all()
     return results
 
+def dao_member_update(db, member_obj, member_id, firstname, lastname, gender, country, native_lang, lang_focus, line_id, meetup_name, last_modified):
+    member = member_obj.query.filter_by(id=member_id).first()
+
+    member.firstname = firstname
+    member.lastname = lastname
+    member.gender = gender
+    member.country = country
+    member.native_lang = native_lang
+    member.lang_focus = lang_focus
+    member.line_id = line_id
+    member.meetup_name = meetup_name
+    member.last_modified = last_modified
+
+    db.session.commit()
+    
+
 
 #########
 #

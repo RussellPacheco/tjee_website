@@ -169,7 +169,7 @@ export default {
                 })
                 
             } else {
-                this.newAdminString = this.newAdmin.toString()
+                this.newAdminString = this.newAdmin.text.toString()
                 this.$refs['admin-save-modal'].show()
             }
         },
