@@ -246,7 +246,6 @@ export default new Vuex.Store({
 
     setPendingMembers(state, payload) {
       state.pendingMembers = payload
-      console.log(state.pendingMembers)
     },
 
 ////////////
@@ -297,6 +296,20 @@ export default new Vuex.Store({
         }
       } catch (err) {
         console.error(err)
+      }
+    },
+
+    async updateMember({ dispatch }, payload) {
+      try {
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.post("/api/members/update/", payload, auth)
+        if (res.data.status == 0) {
+          dispatch("getMembers")
+        } else {
+          throw "Member not found!"
+        }        
+      } catch (err) {
+        console.log(err)        
       }
     },
 
@@ -379,7 +392,22 @@ export default new Vuex.Store({
       } catch (err) {
         console.error(err)
       }
+    },
 
+    async createNewAdmin({ commit, dispatch }, payload) {
+      try {
+        commit
+        const auth = { headers: { Authorization: this.state.jwt } }
+        const res = await axios.post("/api/admins/create/", payload, auth)
+        if (res.data.status == 0) {
+          dispatch("getAdmins")
+        } else {
+          throw "Create New Admin Failed!"
+
+        }
+      } catch (err) {
+        console.error(err)
+      }
     },
 
 ////////////

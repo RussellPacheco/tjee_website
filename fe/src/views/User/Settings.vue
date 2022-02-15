@@ -94,11 +94,28 @@
         </b-row>
     </b-container>
 </b-modal>
-<b-modal hide-header-close no-close-on-backdrop @ok="handleAdminSave" ref="admin-save-modal" ok-variant="success" ok-title="Save" :title="'Are you sure you want to bestow Admin powers upon '+ newAdminString +'?'">
+<b-modal hide-header-close no-close-on-backdrop @ok="handleAdminSaveOk" id="new-admin-confirm-modal" ref="new-admin-confirm-modal" ok-variant="success" ok-title="Save" :title="'Please enter an admin username for '+ newAdminString +'.'">
+    <b-container>
+        <b-row>
+            <b-col>
+                <b-form ref="form" @submit.stop.prevent="handleAdminSave">
+                    <b-form-group label="Username:" label-cols-lg="3" label-size="lg" label-class="pt-0" class="mb-0">
+                        <b-form-input id="username" placeholder="Please enter a username..." v-model="adminUsername" :state="validation"></b-form-input>
+                        <b-form-invalid-feedback>The username must be 5-12 characters long.</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group label="Password:" label-cols-lg="3" label-size="lg" label-class="pt-0" class="mb-0">
+                        <b-form-input id="password" placeholder="test123" disabled></b-form-input>
+                    </b-form-group>
+                </b-form>
+            </b-col>
+        </b-row>
+    </b-container>
+</b-modal>
+<b-modal hide-header-close no-close-on-backdrop @ok="saveNewAdmin" ref="admin-save-modal" ok-variant="success" ok-title="Save" :title="'Are you sure you want to bestow Admin powers upon '+ newAdminString +'?'">
     <b-container>
         <b-row>
             <b-col class="d-flex justify-content-center">
-                <img src="../../assets/img/knight.gif" />
+                <img id="knight-img" src="../../assets/img/knight.gif" />
             </b-col>
         </b-row>
     </b-container>
@@ -128,9 +145,21 @@ export default {
                     }
                 }
             }).filter(item => item != undefined),
-            newAdmin: "",
-            newAdminString: ""           
+            newAdmin: {},
+            newAdminString: "",
+            adminUsername: ""           
         }
+    },
+    computed: {
+        validation() {
+            if (this.adminUsername.length == 0) {
+                return null
+            } else if (this.adminUsername.length > 4 && this.adminUsername.length < 13) {
+                return true
+            } else {
+                return false
+            }
+        },
     },
     methods: {
         handleClear() {
@@ -139,7 +168,6 @@ export default {
             }
 
         },
-
         handleConfirm() {
             if (this.formVerification() && this.formVerification() != -1) {
                 this.$refs['save-modal'].show()
@@ -159,7 +187,6 @@ export default {
             
 
         },
-
         handleAdminConfirm() {
             if (this.newAdmin == "") {
                 this.$bvToast.toast('No member selected!', {
@@ -169,19 +196,35 @@ export default {
                 })
                 
             } else {
-                this.newAdminString = this.newAdmin.toString()
-                this.$refs['admin-save-modal'].show()
+                this.newAdminString = this.newAdmin.firstname.toString() + " " + this.newAdmin.lastname.toString()
+                this.$refs['new-admin-confirm-modal'].show()
             }
+        },
+        handleAdminSaveOk(bvModalEvt) {
+            bvModalEvt.preventDefault()
+            this.handleAdminSave()
+        },
+        handleAdminSave() {
+            if (this.adminUsername.length <= 4 || this.adminUsername.length > 12) {
+                this.$bvToast.toast('Username length not sufficient!', {
+                    title: "Please fix the username length.",
+                    variant: "danger",
+                    solid: true
+                })
+                return
+            }
+            this.$nextTick(() => {
+                this.$bvModal.hide('new-admin-confirm-modal')
+            })
+            this.$refs['admin-save-modal'].show()
         },
 
         async handleSave() {
-
             const admin = {
                 old_password: this.password.currentPassword,
                 new_password: this.password.newPassword,
                 username: this.$store.state.currentAdmin.username
             }
-
             await this.$store.dispatch("saveNewPassword", admin)
             if (this.status == 0) {
                 this.password = {
@@ -189,7 +232,6 @@ export default {
                     newPassword: "",
                     retypePassword: "",    
                 }
-
                 this.$bvToast.toast("Your password was changed.", {
                     title: "Success!",
                     variant: "success",
@@ -198,8 +240,24 @@ export default {
             }
         },
 
-        handleAdminSave() {
+        async saveNewAdmin() {
+            const newAdmin = {
+                member_id: this.newAdmin.id,
+                username: this.adminUsername,
+                password: "test123"
+            }
+            await this.$store.dispatch("createNewAdmin", newAdmin)
+            await this.$store.dispatch("getAdmins")
 
+            this.memberList = this.$store.state.members.map((member) => {
+                const adminList = this.$store.state.admins.map(admin => admin.firstname)
+                if(!adminList.includes(member.firstname)) {
+                    return {
+                        text: member.firstname + " " + member.lastname, 
+                        value: member
+                    }
+                }
+            }).filter(item => item != undefined)
         },
 
         formVerification() {

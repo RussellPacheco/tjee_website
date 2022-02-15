@@ -130,7 +130,7 @@
             </b-col>
             <b-col>
                 <div v-for="(property, index) in editMemberDetails" :key="index">
-                    <b>{{property.value}}</b>
+                    <b>{{ property.name == "ID" ? property.value.slice(0, 10) : property.value}}</b>
                 </div>
             </b-col>
         </b-row>
@@ -148,6 +148,7 @@ export default {
         return {
             langList: langList,
             editMemberDetails: {
+                memberId: {name:"ID", value: this.$store.state.editMember.id},
                 firstname: {name: "First Name", value: this.$store.state.editMember.firstname},
                 lastname: {name: "Last Name", value: this.$store.state.editMember.lastname},
                 gender: {name: "Gender", value: this.$store.state.editMember.gender},
@@ -197,7 +198,27 @@ export default {
         },
 
         handleSave() {
+            const updateMember = {
+                id: this.editMemberDetails.memberId.value,
+                firstname: this.editMemberDetails.firstname.value,
+                lastname: this.editMemberDetails.lastname.value,
+                gender: this.editMemberDetails.gender.value,
+                country: this.editMemberDetails.country.value,
+                native_lang: this.editMemberDetails.nativeLang.value,
+                lang_focus: this.editMemberDetails.learningLang.value,
+                line_id: this.editMemberDetails.lineId.value,
+                meetup_name: this.editMemberDetails.meetupName.value,
+            }
 
+            console.log(updateMember)
+
+            this.$store.dispatch("updateMember", updateMember)
+
+            this.$bvToast.toast("Member successfully updated!", {
+                title: "Member Updated",
+                variant: "success",
+                solid: true
+            })
         },
 
         formVerification() {
@@ -207,7 +228,6 @@ export default {
                     toggle = false
                 }
             }
-
             if (!toggle) {
                 return false
             } else {
