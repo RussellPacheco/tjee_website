@@ -22,7 +22,7 @@ CORS(app, origins=["http://localhost:8080", "http://localhost:5000"])
 app.config["SQLALCHEMY_DATABASE_URI"] = f'postgresql://{DB_CONNECTION}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config.update(CELERY_BROKER_URL=os.getenv("CLOUDAMQP_URL"),
-                  BROKER_POOL_LIMIT=1,
+                  broker_pool_limit=1,
                   )
 
 celery = make_celery(app)
