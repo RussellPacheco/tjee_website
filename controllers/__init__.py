@@ -1,3 +1,4 @@
+from itsdangerous import json
 from services import *
 
 
@@ -33,6 +34,14 @@ def controller_get_all_members(member_obj):
         data = service_get_all_members(member_obj)
         return data
 
+    except Exception as e:
+        print(e)
+        return str(e)
+
+def controller_member_update(db, member_obj, json_data):
+    try:
+        data = service_member_update(db, member_obj, json_data)
+        return data
     except Exception as e:
         print(e)
         return str(e)

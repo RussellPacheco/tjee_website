@@ -1,3 +1,4 @@
+from typing import Counter
 import dotenv
 import base64
 import hmac
@@ -5,6 +6,8 @@ import binascii
 import hashlib
 import os
 from datetime import datetime, timedelta
+
+from itsdangerous import json
 from dao import *
 from .utils import send_message
 import requests
@@ -19,15 +22,11 @@ dotenv.load_dotenv()
 
 @celery.task()
 def update_new_members():
-    print("inside new members")
     new_member_obj = NewMembers
     meetup = Meetup()
     meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
-    print("logged in")
     meetup_pending_members = meetup.get_pending_members()
-    print("got pending members from meetup scraper")
     dao_pending_members = service_get_new_member_applications(new_member_obj)
-    print("got service get new member applications")
     members_to_save = []
 
     if dao_pending_members["pending_members"] is None or len(dao_pending_members["pending_members"]) != 0:
@@ -179,6 +178,48 @@ def service_get_all_members(member_obj):
         members.append(json_object)
 
     return {"members": members, "status": 0}
+
+def service_member_update(db, member_obj, json_data):
+
+    member_id = json_data["id"]
+    firstname = json_data["firstname"]
+    lastname = json_data["lastname"]
+    gender = json_data["gender"]
+    country = json_data["country"]
+    native_lang = json_data["native_lang"]
+    lang_focus = json_data["lang_focus"]
+    line_id = json_data["line_id"]
+    meetup_name = json_data["meetup_name"]
+    last_modified = datetime.now()
+
+
+    exists = dao_get_member_by_id(member_obj, member_id)
+    status = {"status": 1}
+    
+    if exists == None:
+        return status
+
+
+
+    dao_member_update(
+        db, 
+        member_obj, 
+        member_id=member_id, 
+        firstname=firstname, 
+        lastname=lastname, 
+        gender=gender, 
+        country=country, 
+        native_lang=native_lang,
+        lang_focus=lang_focus,
+        line_id=line_id,
+        meetup_name=meetup_name,
+        last_modified=last_modified
+        )
+    
+    status["status"] = 0
+    return status
+
+
 
 
 #########
