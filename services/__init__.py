@@ -651,7 +651,6 @@ def service_line_delete_message(db, line_obj, message_id):
 #########
 
 def service_get_new_member_applications(new_members_obj):
-    print("got in service_get_new_member_applications")
     results = dao_get_new_member_application(new_members_obj)
     status = {"status": 1}
     if results is None:
@@ -676,10 +675,7 @@ def service_get_new_member_applications(new_members_obj):
 
 
 def service_update_new_member_applications():
-    print("got in from route to service_update_new_member_applications")
-    print("going into celery")
     result = update_new_members.delay()
-    print("returning from service_update_new_member_applications")
     return {"status": 0}
 
 

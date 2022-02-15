@@ -7,15 +7,11 @@ from app.models import db, NewMembers
 
 @celery.task()
 def update_new_members():
-    print("inside new members")
     new_member_obj = NewMembers
     meetup = Meetup()
     meetup.login(email=os.getenv("MEETUP_EMAIL"), password=os.getenv("MEETUP_PASSWORD"))
-    print("logged in")
     meetup_pending_members = meetup.get_pending_members()
-    print("got pending members from meetup scraper")
     dao_pending_members = services.service_get_new_member_applications(new_member_obj)
-    print("got service get new member applications")
     members_to_save = []
 
     if dao_pending_members["pending_members"] is None or len(dao_pending_members["pending_members"]) != 0:
