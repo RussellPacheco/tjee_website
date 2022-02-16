@@ -27,7 +27,7 @@
                     <b-col></b-col>
                     <b-col class="d-flex mt-2 flex-row-reverse">
                         <b-button v-b-modal.confirm-modal>Save Message</b-button>
-                        <b-modal ref="confirmModal" size="lg" hide-header-close no-close-on-backdrop @ok="handleOk" id="confirm-modal" title="Confirm Your Message">
+                        <b-modal ref="confirmModal" size="lg" hide-header-close no-close-on-backdrop @ok="handleOk" id="confirm-modal" title="Save this message?">
                             <b-container>
                                 <b-row>
                                     <b-col></b-col>
@@ -60,12 +60,35 @@ export default {
 
     methods: {
         handleOk() {
-            const payload = {
-                created_by: this.$store.state.currentAdmin.member_id,
-                message: {title: this.title, body: this.text}
+            if (this.validation()) {
+                const payload = {
+                    created_by: this.$store.state.currentAdmin.member_id,
+                    message: {title: this.title, body: this.text}
+                }
+                this.$store.dispatch("saveLineMessage", payload)
+                this.$refs['confirmModal'].hide('confirm-modal')
+                this.text = ""
+                this.title = ""
+                this.$bvToast.toast("Message Saved!", {
+                    title: "Success",
+                    variant: "success",
+                    solid: true
+                })
+            } else {
+                this.$bvToast.toast("Please feel out all fields!", {
+                    title: "Fields are empty",
+                    variant: "danger",
+                    solid: true
+                })
+
             }
-            this.$store.dispatch("saveLineMessage", payload)
-            this.$refs['confirmModal'].hide('confirm-modal')
+        },
+
+        validation() {
+            if (this.title == "" || this.text == "") {
+                return false
+            }
+            return true
         },
 
         clearMessage() {

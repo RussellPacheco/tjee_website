@@ -11,7 +11,7 @@
                         Your user ID must be 5-12 characters long.
                     </b-form-invalid-feedback>
                     <label for="text-password">Password</label>
-                    <b-form-input v-model="user.password" type="password" id="text-password" aria-describedby="password-help-block"></b-form-input>
+                    <b-form-input v-model="user.password" @keypress.enter="login" type="password" id="text-password" aria-describedby="password-help-block"></b-form-input>
                     <b-form-text id="password-help-block">
                         Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
                     </b-form-text>

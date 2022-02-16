@@ -121,7 +121,7 @@
                 </b-card>
         </b-col>
     </b-row>
-    <b-modal hide-header-close no-close-on-backdrop @ok="handleSave" ref="save-modal" ok-title="Save" title="Please Confirm Details to Save">
+    <b-modal hide-header-close no-close-on-backdrop @ok="handleSave" ref="save-modal" ok-title="Save" title="Save these details?">
         <b-row>
             <b-col>
                 <div class="ml-5" v-for="(property, index) in editMemberDetails" :key="index">
