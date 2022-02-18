@@ -64,7 +64,6 @@
                 </b-col>
             </b-row>
         </b-container>
-
     </b-modal>
 </div>
   
@@ -84,7 +83,6 @@ export default {
                 created_at: "",
                 last_sent: ""
             },
-
             fields:[
                 {key:"num_id", label:"ID"}, 
                 {key:"title"},
@@ -93,9 +91,7 @@ export default {
                 {key: "created_at"}, 
                 {key: "last_sent"}
             ],
-
             items: this.$store.state.messages,
-
             modalFields: [
                 {key:"num_id", label:"ID"}, 
                 {key:"title"},
@@ -103,7 +99,6 @@ export default {
                 {key: "created_at"}, 
                 {key: "last_sent"}
             ],
-
         }
     },
 
@@ -114,6 +109,7 @@ export default {
         },
 
         handleSend() {
+            this.$store.commit("setSelectedMessage", this.message)
             this.$router.push({name: 'SendMessage'})
 
         },
@@ -123,7 +119,7 @@ export default {
         },
 
         handleEdit() {
-            this.$store.commit("setEditMessage", this.message)
+            this.$store.commit("setSelectedMessage", this.message)
             this.$router.push({name: 'EditMessage'})
         }
 

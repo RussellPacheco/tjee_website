@@ -117,7 +117,7 @@ export default new Vuex.Store({
         last_modified: "The other day"
       }
     ],
-    editMessage: {
+    selectedMessage: {
       id: 0,
       num_id: 0,
       created_by: "Default",
@@ -224,8 +224,8 @@ export default new Vuex.Store({
     setMessages(state, payload) {
       state.messages = payload
     },    
-    setEditMessage(state, payload) {
-      state.editMessage = payload
+    setSelectedMessage(state, payload) {
+      state.selectedMessage = payload
     },
 
 ////////////
@@ -383,13 +383,11 @@ export default new Vuex.Store({
         context
         const auth = { headers: { Authorization: this.state.jwt } }
         const res = await axios.post("/api/admins/password", payload, auth)
-
         if (res.data.status != 0) {
-          EventBus.$emit("failedPassword", 1)
-
+          throw "New password not saved!"
         }
-
       } catch (err) {
+        EventBus.$emit("failedPassword", 1)
         console.error(err)
       }
     },
@@ -441,9 +439,24 @@ export default new Vuex.Store({
       try {
         const auth = { headers: { Authorization: this.state.jwt } }
         const res = await axios.post(`/api/line/messages/message/${payload.id}`, payload, auth)
-        commit("setMessages", res.data.messages)        
-
+        commit("setMessages", res.data.messages)    
       } catch (err) {
+        console.error(err)
+      }
+    },
+
+    async sendScheduledMessage(context, payload) {
+      try {
+        context
+        const auth = { header: { Authorization: this.state.jwt } }
+        const res = await axios.post("/api/line/messages/send", payload, auth)
+        if (res.data.status == 1) {
+          throw res.data.error
+        }
+        EventBus.$emit("scheduledMessageStatus", 0)
+        
+      } catch (err) {
+        EventBus.$emit("scheduledMessageStatus", 1)
         console.error(err)
       }
     },
@@ -494,7 +507,6 @@ export default new Vuex.Store({
       try {
         const auth = { headers: { Authorization: this.state.jwt } }
         await axios.get("/api/meetup/new-members/update/", auth)
-
       } catch (err) {
         console.error(err)
       }
@@ -506,7 +518,6 @@ export default new Vuex.Store({
         if (res.data.status == 0) {
           commit("setPendingMembers", res.data.pending_members)
         }
-
       } catch (err) {
         console.error(err)
       }
@@ -518,7 +529,6 @@ export default new Vuex.Store({
         if (res.data.status == 0) {
           commit("setPendingMembers", res.data.pending_members)
         }
-
       } catch (err) {
         console.error(err)
       }

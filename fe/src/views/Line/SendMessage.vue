@@ -35,12 +35,12 @@
                 <b-row class="mt-3">
                     <b-col>
                         <b-button id="left-button" variant="danger" @click="handleReset">Reset</b-button>
-                        <b-button variant="success" @click="handleSave">Save</b-button>
+                        <b-button variant="success" @click="showScheduleSaveConfirmModal">Save</b-button>
                     </b-col>
                 </b-row>
             </b-col>
         </b-row>
-        <b-modal hide-header-close no-close-on-backdrop @ok="handleConfirm" ref="confirm-modal" ok-title="Confirm" title="Please confirm the date and time:">
+        <b-modal hide-header-close no-close-on-backdrop @ok="handleScheduleSend" ref="confirm-modal" ok-title="Confirm" title="Please confirm the date and time:">
             <b-container class="text-center">
                 <b-row>
                     <b-col>The message will be sent at</b-col>
@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import { EventBus } from "../../utils"
+
 export default {
     name: "SendMessage",
     data() {
@@ -84,8 +86,14 @@ export default {
             this.date = ""
             this.time = ""
         },
-
         handleSave() {
+            const messageDetails = {
+                message: this.$store.state.selectedMessage,
+                schedule: "now"
+            }
+            this.$store.dispatch("sendScheduledMessage", messageDetails)
+        },
+        showScheduleSaveConfirmModal() {
             if(this.date != "" && this.time != "") {
                 this.$refs['confirm-modal'].show()
             } else {
@@ -97,8 +105,15 @@ export default {
             }
         }, 
 
-        handleConfirm() {
+        handleScheduleSend() {
+            const date = new Date()
+            const convertedDate = date.toUTCString(this.date + " " + this.time)
 
+            const messageDetails = {
+                message: this.$store.state.selectedMessage,
+                schedule: convertedDate
+            }
+            this.$store.dispatch("sendScheduledMessage", messageDetails)
         },
 
         onDateContext(ctx) {
@@ -108,7 +123,28 @@ export default {
         onTimeContext(ctx) {
             this.timeContext = ctx
         }
-    }
+    },
+    mounted() {
+        EventBus.$on('scheduledMessageStatus', (status) => {
+            if (status == 1) {
+                this.$bvToast.toast("Password was not scheduled", {
+                    title: "Error!",
+                    variant: "danger",
+                    solid: true
+                })                
+            } else {
+                this.$bvToast.toast("Password was scheduled!", {
+                    title: "Scheduled Message Success!",
+                    variant: "success",
+                    solid: true
+                })
+            }
+
+        })
+    },
+    beforeDestroy () {
+        EventBus.$off('scheduledMessageStatus')
+  }
 
 }
 </script>

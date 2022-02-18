@@ -90,8 +90,6 @@ export default {
         handleOk() {
             this.editingMessage.message = this.text
             this.$store.dispatch("saveEditedMessage", this.editingMessage)
-
-
         },
 
         clearMessage() {
