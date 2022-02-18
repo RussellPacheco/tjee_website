@@ -563,7 +563,7 @@ def service_line_send_message(db, line_obj, json_data):
     status = {"status": 1}
     message = json_data["message"]["message"]
     schedule = json_data["schedule"]
-    destination = "somewhere"
+    destination = os.getenv("LINE_GROUP")
     message_id = json_data["message"]["id"]
     if schedule == "now":
         result = send_message("push", destination, message)
