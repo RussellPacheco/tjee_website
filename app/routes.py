@@ -129,7 +129,6 @@ def webhook():
                                    body=request.get_data(as_text=True),
                                    headers=request.headers,
                                    json_data=request.get_json())
-    # data = controller_line_webhook(db, LineWebhooks, request.get_json())
     return data
 
 

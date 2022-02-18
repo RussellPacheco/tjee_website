@@ -6,8 +6,6 @@ import binascii
 import hashlib
 import os
 from datetime import datetime, timedelta
-
-from itsdangerous import json
 from dao import *
 from .utils import send_message
 import requests
@@ -15,7 +13,7 @@ import jwt
 from flask import current_app, jsonify
 from app.meetup_scraper import Meetup
 from app import celery
-from app.models import NewMembers, db
+from app.models import NewMembers, db, LineMessage
 
 dotenv.load_dotenv()
 
@@ -67,6 +65,17 @@ def update_new_members():
     meetup.quit()
     new_member_apps = service_get_new_member_applications(new_member_obj)
     return new_member_apps
+
+@celery.task()
+def send_scheduled_message(destination, message, message_id):
+    result = send_message(destination, message)
+
+    if result != 0:
+        return
+
+    dao_line_update_message_time(db, LineMessage, message_id, datetime.now())
+
+
 
 
 #########
@@ -375,6 +384,8 @@ def service_admin_change_password(db, admin_obj, json_data):
 #########
 
 def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
+    print(json_data)
+
     # def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'
@@ -552,16 +563,23 @@ def service_line_create_message(db, line_obj, json_data):
 
 def service_line_send_message(db, line_obj, json_data):
     status = {"status": 1}
-    MESSAGE = json_data["message"]
-    DESTINATION = json_data["destination"]
+    message = json_data["message"]["message"]
+    schedule = json_data["schedule"]
+    destination = "somewhere"
+    message_id = json_data["message"]["id"]
+    if schedule == "now":
+        result = send_message("push", destination, message)
 
-    result = send_message("push", DESTINATION, MESSAGE)
+        if result != 0:
+            status["error"] = result
+            return status
 
-    if result != 0:
-        status["error"] = result
-        return status
+        dao_line_update_message_time(db, line_obj, message_id=message_id, last_modified=datetime.now())
 
-    dao_line_update_message_time(db, line_obj, json_data["message_id"], datetime.now())
+
+    else: 
+        schedule = datetime.strptime(schedule, "%a, %d %b %Y %H:%M:%S %Z")
+        send_message.apply_async(("push", destination, message, message_id), eta=schedule)
 
     return status
 
