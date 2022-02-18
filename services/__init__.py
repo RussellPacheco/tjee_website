@@ -384,8 +384,6 @@ def service_admin_change_password(db, admin_obj, json_data):
 #########
 
 def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
-    print(json_data)
-
     # def service_line_webhook(db, webhook_obj, json_data):
 
     # Useful 'type'

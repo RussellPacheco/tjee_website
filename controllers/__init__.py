@@ -112,7 +112,6 @@ def controller_admin_change_password(db, admin_obj, json_data):
 def controller_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data):
     try:
         data = service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, json_data)
-        print("in controller")
         return data
     except Exception as e:
         print(e)
