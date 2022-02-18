@@ -42,7 +42,7 @@ def upgrade():
 
     op.bulk_insert(bot_permissions_table, [{
         "id": 1,
-        "permission_name": "JOIN_GROUP_CHAT",
+        "permission_name": "group_join",
         "permission_value": False,
         "last_modified": datetime.now()
     }])
