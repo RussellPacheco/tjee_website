@@ -486,7 +486,7 @@ def service_line_webhook(db, webhook_obj, bot_permission_obj, body, headers, jso
                                       userId=USER_ID)
                 if EVENT_TYPE == "join":
                     allowed = dao_line_get_bot_permission(bot_permission_obj, permission_name="group_join")
-                    if allowed.permission:
+                    if allowed.permission_name:
                         text = """
                         
                         Thank you for inviting me! 
